@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1400, initial-scale=1.0">
+<title>AumEstate Studio — Project Mind Map</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+  h1 {
+    font-size: 28px;
+    color: #38bdf8;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .subtitle {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+  .cmd {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 14px;
+    color: #a78bfa;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
+  .cmd-label {
+    color: #64748b;
+    font-size: 12px;
+    margin-bottom: 30px;
+  }
+
+  /* Mind map container */
+  .mindmap {
+    position: relative;
+    width: 1300px;
+    min-height: 900px;
+  }
+
+  /* Center node */
+  .center-node {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 20px;
+    padding: 20px 32px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
+    z-index: 10;
+  }
+  .center-node .name { font-size: 20px; font-weight: 700; color: #fff; }
+  .center-node .tech { font-size: 11px; color: #c4b5fd; margin-top: 4px; }
+
+  /* Branch groups */
+  .branch {
+    position: absolute;
+    z-index: 5;
+  }
+  .branch-title {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 8px;
+    white-space: nowrap;
+  }
+  .branch-items {
+    list-style: none;
+    padding-left: 16px;
+  }
+  .branch-items li {
+    font-size: 12px;
+    padding: 4px 12px;
+    margin: 3px 0;
+    border-radius: 6px;
+    background: #1e293b;
+    border-left: 3px solid;
+    white-space: nowrap;
+    position: relative;
+  }
+  .branch-items li .step {
+    font-size: 10px;
+    font-weight: 700;
+    margin-right: 4px;
+    opacity: 0.7;
+  }
+  .branch-items li .tag {
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    font-weight: 600;
+  }
+  .tag-server { background: #065f46; color: #6ee7b7; }
+  .tag-client { background: #7c2d12; color: #fdba74; }
+  .tag-auto { background: #1e3a5f; color: #7dd3fc; }
+  .tag-edit { background: #4a1d6a; color: #d8b4fe; }
+
+  /* Colors per branch */
+  .b-config .branch-title { background: #164e63; color: #67e8f9; }
+  .b-config .branch-items li { border-color: #22d3ee; }
+
+  .b-data .branch-title { background: #365314; color: #a3e635; }
+  .b-data .branch-items li { border-color: #84cc16; }
+
+  .b-layout .branch-title { background: #713f12; color: #fbbf24; }
+  .b-layout .branch-items li { border-color: #f59e0b; }
+
+  .b-shared .branch-title { background: #581c87; color: #d8b4fe; }
+  .b-shared .branch-items li { border-color: #a855f7; }
+
+  .b-home .branch-title { background: #9f1239; color: #fda4af; }
+  .b-home .branch-items li { border-color: #f43f5e; }
+
+  .b-listings .branch-title { background: #1e3a5f; color: #7dd3fc; }
+  .b-listings .branch-items li { border-color: #38bdf8; }
+
+  .b-detail .branch-title { background: #4a1d6a; color: #d8b4fe; }
+  .b-detail .branch-items li { border-color: #c084fc; }
+
+  .b-contact .branch-title { background: #14532d; color: #86efac; }
+  .b-contact .branch-items li { border-color: #22c55e; }
+
+  .b-seo .branch-title { background: #78350f; color: #fcd34d; }
+  .b-seo .branch-items li { border-color: #eab308; }
+
+  /* SVG lines */
+  .lines {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Legend */
+  .legend {
+    margin-top: 40px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  /* Flow arrow at bottom */
+  .flow {
+    margin-top: 40px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px 40px;
+    text-align: center;
+    max-width: 1000px;
+  }
+  .flow-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #38bdf8;
+    margin-bottom: 12px;
+  }
+  .flow-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .flow-arrow {
+    color: #475569;
+    font-size: 16px;
+  }
+  .fs1 { background: #164e63; color: #67e8f9; }
+  .fs2 { background: #365314; color: #a3e635; }
+  .fs3 { background: #713f12; color: #fbbf24; }
+  .fs4 { background: #581c87; color: #d8b4fe; }
+  .fs5 { background: #9f1239; color: #fda4af; }
+  .fs6 { background: #1e3a5f; color: #7dd3fc; }
+  .fs7 { background: #4a1d6a; color: #d8b4fe; }
+  .fs8 { background: #14532d; color: #86efac; }
+  .fs9 { background: #78350f; color: #fcd34d; }
+</style>
+</head>
+<body>
+
+<h1>AumEstate Studio — Project Mind Map</h1>
+<div class="subtitle">Next.js 15 Real Estate Website Architecture</div>
+<div class="cmd">npx create-next-app@latest aum-estate-studio</div>
+<div class="cmd-label">TypeScript + ESLint + Tailwind CSS + App Router + Turbopack</div>
+
+<div class="mindmap">
+  <!-- SVG connection lines -->
+  <svg class="lines" viewBox="0 0 1300 900">
+    <!-- Config -->
+    <path d="M 650 450 Q 300 400 180 200" stroke="#22d3ee" stroke-width="2" fill="none" opacity="0.4"/>
+    <!-- Data -->
+    <path d="M 650 450 Q 500 300 380 150" stroke="#84cc16" stroke-width="2" fill="none" opacity="0.4"/>
+    <!-- Layout -->
+    <path d="M 650 450 Q 700 300 750 140" stroke="#f59e0b" stroke-width="2" fill="none" opacity="0.4"/>
+    <!-- Shared -->
+    <path d="M 650 450 Q 900 350 1020 160" stroke="#a855f7" stroke-width="2" fill="none" opacity="0.4"/>
+    <!-- Home -->
+    <path d="M 650 450 Q 1050 420 1100 350" stroke="#f43f5e" stroke-width="2" fill="none" opacity="0.4"/>
+    <!-- Listings -->
+    <path d="M 650 450 Q 1050 500 1080 550" stroke="#38bdf8" stroke-width="2" fill="none" opacity="0.4"/>
+    <!-- Detail -->
+    <path d="M 650 450 Q 950 650 1000 700" stroke="#c084fc" stroke-width="2" fill="none" opacity="0.4"/>
+    <!-- Contact -->
+    <path d="M 650 450 Q 500 650 350 720" stroke="#22c55e" stroke-width="2" fill="none" opacity="0.4"/>
+    <!-- SEO -->
+    <path d="M 650 450 Q 300 550 160 650" stroke="#eab308" stroke-width="2" fill="none" opacity="0.4"/>
+  </svg>
+
+  <!-- Center -->
+  <div class="center-node">
+    <div class="name">AumEstate Studio</div>
+    <div class="tech">Next.js 15 + React 19 + TS + Tailwind v4</div>
+  </div>
+
+  <!-- Branch 1: Config -->
+  <div class="branch b-config" style="left: 30px; top: 80px;">
+    <div class="branch-title">STEP 1 : Config & Styling</div>
+    <ul class="branch-items">
+      <li><span class="step">AUTO</span> package.json <span class="tag tag-auto">auto</span></li>
+      <li><span class="step">AUTO</span> tsconfig.json <span class="tag tag-auto">auto</span></li>
+      <li><span class="step">AUTO</span> postcss.config.mjs <span class="tag tag-auto">auto</span></li>
+      <li><span class="step">EDIT</span> next.config.ts <span class="tag tag-edit">edit</span></li>
+      <li><span class="step">  1 </span> app/globals.css <span class="tag tag-edit">write</span></li>
+    </ul>
+  </div>
+
+  <!-- Branch 2: Data -->
+  <div class="branch b-data" style="left: 300px; top: 30px;">
+    <div class="branch-title">STEP 2 : Data Layer</div>
+    <ul class="branch-items">
+      <li><span class="step">  2 </span> lib/mock-data.ts <span class="tag tag-edit">write</span></li>
+      <li style="border-color: #65a30d; background: #1a2e05; font-size:11px;">Property type, Agent type</li>
+      <li style="border-color: #65a30d; background: #1a2e05; font-size:11px;">12 properties + 3 agents</li>
+      <li style="border-color: #65a30d; background: #1a2e05; font-size:11px;">getFeaturedProperties()</li>
+      <li style="border-color: #65a30d; background: #1a2e05; font-size:11px;">getPropertyById(id)</li>
+    </ul>
+  </div>
+
+  <!-- Branch 3: Layout -->
+  <div class="branch b-layout" style="left: 620px; top: 20px;">
+    <div class="branch-title">STEP 3 : Layout Shell</div>
+    <ul class="branch-items">
+      <li><span class="step">  3 </span> app/layout.tsx <span class="tag tag-server">Server</span></li>
+      <li><span class="step">  4 </span> components/Navbar.tsx <span class="tag tag-client">Client</span></li>
+      <li><span class="step">  5 </span> components/Footer.tsx <span class="tag tag-server">Server</span></li>
+    </ul>
+  </div>
+
+  <!-- Branch 4: Shared Components -->
+  <div class="branch b-shared" style="left: 940px; top: 40px;">
+    <div class="branch-title">STEP 4 : Shared Components</div>
+    <ul class="branch-items">
+      <li><span class="step">  6 </span> components/PropertyCard.tsx <span class="tag tag-client">Client</span></li>
+      <li><span class="step">  7 </span> components/SearchBar.tsx <span class="tag tag-client">Client</span></li>
+    </ul>
+  </div>
+
+  <!-- Branch 5: Home -->
+  <div class="branch b-home" style="left: 1020px; top: 260px;">
+    <div class="branch-title">STEP 5 : Home Page</div>
+    <ul class="branch-items">
+      <li><span class="step">  8 </span> app/page.tsx <span class="tag tag-server">Server</span></li>
+      <li style="border-color: #e11d48; background: #2a0a14; font-size:11px;">Hero + SearchBar</li>
+      <li style="border-color: #e11d48; background: #2a0a14; font-size:11px;">Featured PropertyCards x4</li>
+    </ul>
+  </div>
+
+  <!-- Branch 6: Listings -->
+  <div class="branch b-listings" style="left: 1000px; top: 470px;">
+    <div class="branch-title">STEP 6 : Listings Page</div>
+    <ul class="branch-items">
+      <li><span class="step">  9 </span> components/FilterSidebar.tsx <span class="tag tag-client">Client</span></li>
+      <li><span class="step"> 10 </span> components/ListingsClient.tsx <span class="tag tag-client">Client</span></li>
+      <li><span class="step"> 11 </span> app/listings/page.tsx <span class="tag tag-server">Server</span></li>
+      <li style="border-color: #0ea5e9; background: #0c1e2e; font-size:11px;">Suspense + useSearchParams</li>
+    </ul>
+  </div>
+
+  <!-- Branch 7: Detail -->
+  <div class="branch b-detail" style="left: 880px; top: 680px;">
+    <div class="branch-title">STEP 7 : Property Detail</div>
+    <ul class="branch-items">
+      <li><span class="step"> 12 </span> components/ImageGallery.tsx <span class="tag tag-client">Client</span></li>
+      <li><span class="step"> 13 </span> app/listings/[id]/page.tsx <span class="tag tag-server">Server</span></li>
+      <li style="border-color: #a855f7; background: #1a0a2e; font-size:11px;">await params + JSON-LD</li>
+    </ul>
+  </div>
+
+  <!-- Branch 8: Contact -->
+  <div class="branch b-contact" style="left: 200px; top: 660px;">
+    <div class="branch-title">STEP 8 : Contact Page</div>
+    <ul class="branch-items">
+      <li><span class="step"> 14 </span> components/ContactForm.tsx <span class="tag tag-client">Client</span></li>
+      <li><span class="step"> 15 </span> app/contact/page.tsx <span class="tag tag-server">Server</span></li>
+      <li style="border-color: #16a34a; background: #052e16; font-size:11px;">agents list + form validation</li>
+    </ul>
+  </div>
+
+  <!-- Branch 9: SEO -->
+  <div class="branch b-seo" style="left: 30px; top: 560px;">
+    <div class="branch-title">STEP 9 : SEO & Error</div>
+    <ul class="branch-items">
+      <li><span class="step"> 16 </span> app/not-found.tsx <span class="tag tag-server">Server</span></li>
+      <li><span class="step"> 17 </span> app/robots.ts <span class="tag tag-server">Server</span></li>
+      <li><span class="step"> 18 </span> app/sitemap.ts <span class="tag tag-server">Server</span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#065f46"></div> Server Component</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#7c2d12"></div> Client Component ('use client')</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#1e3a5f"></div> Auto-generated</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#4a1d6a"></div> Edit / Write</div>
+</div>
+
+<!-- Flow -->
+<div class="flow">
+  <div class="flow-title">Coding Order (Bottom-up approach)</div>
+  <div class="flow-steps">
+    <span class="flow-step fs1">Config</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step fs2">Data</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step fs3">Layout</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step fs4">Shared</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step fs5">Home</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step fs6">Listings</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step fs7">Detail</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step fs8">Contact</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step fs9">SEO</span>
+  </div>
+</div>
+
+</body>
+</html>

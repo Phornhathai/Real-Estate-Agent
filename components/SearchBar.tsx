@@ -1,0 +1,292 @@
+// =============================================================================
+// 📁 components/SearchBar.tsx — Search Bar พร้อม Autocomplete Dropdown
+// =============================================================================
+//
+// 🔑 ทำไมต้องเป็น Client Component?
+// ─────────────────────────────────────
+// SearchBar ต้องใช้ 'use client' เพราะ:
+//   1. useState()  — เก็บค่า search query + สถานะเปิด/ปิด dropdown
+//   2. useRouter() — navigate ไปหน้า /listings พร้อม query params
+//   3. onChange, onFocus, onBlur, onSubmit — event handlers จาก user
+//
+// 🔑 Programmatic Navigation — useRouter vs useNavigate:
+// ──────────────────────────────────────────────────────────
+// React JS:  const navigate = useNavigate();
+//            navigate('/listings?location=Bangkok');
+//            → ใช้ useNavigate() จาก react-router-dom
+//
+// Next.js:   const router = useRouter();
+//            router.push('/listings?location=Bangkok');
+//            → ใช้ useRouter() จาก next/navigation
+//            → ทั้งคู่ทำ client-side navigation (ไม่ reload หน้า)
+//
+// 🔑 ความแตกต่างเพิ่มเติม:
+//   React JS: navigate(-1)       ← ย้อนกลับ
+//   Next.js:  router.back()      ← ย้อนกลับ
+//   React JS: navigate(0)        ← refresh
+//   Next.js:  router.refresh()   ← refresh (แต่ไม่ reload ทั้งหน้า)
+//
+// 🔑 URL Query Parameters:
+// ──────────────────────────
+// ทั้ง React JS และ Next.js ใช้ encodeURIComponent() เพื่อ encode ค่าที่ใส่ใน URL
+// เช่น "Beverly Hills, CA" → "Beverly%20Hills%2C%20CA"
+// ป้องกันอักขระพิเศษทำให้ URL เสีย
+// =============================================================================
+
+'use client';
+// 🔑 Next.js: ต้องใส่ 'use client' เพราะ component นี้ใช้ hooks (useState, useRouter)
+// React JS: ไม่ต้องใส่บรรทัดนี้ เพราะทุก component เป็น client อยู่แล้ว
+
+import { useState } from 'react';
+// useState = hook สำหรับเก็บ state 2 ตัว: query (ข้อความ search) + showSuggestions (เปิด/ปิด dropdown)
+
+import { useRouter } from 'next/navigation';
+// 🔑 Next.js: useRouter จาก 'next/navigation' — ใช้ router.push() สำหรับ navigate
+// React JS: useNavigate จาก 'react-router-dom' — ใช้ navigate() สำหรับ navigate
+// ⚠️ Next.js มี useRouter 2 ตัว ระวังสับสน:
+//   - 'next/navigation' (App Router — ใช้ตัวนี้) ✅
+//   - 'next/router' (Pages Router — เก่าแล้ว ไม่ใช้) ❌
+
+// -----------------------------------------------------------------------------
+// 📋 Suggestions Data — รายชื่อเมืองสำหรับ autocomplete dropdown
+// ข้อมูล mock แบบ static — ในโปรเจกต์จริงอาจ fetch จาก API
+// -----------------------------------------------------------------------------
+const SUGGESTIONS = [
+  'Beverly Hills, CA',
+  'Santa Monica, CA',
+  'Malibu, CA',
+  'Los Angeles, CA',
+  'Pasadena, CA',
+  'Palm Springs, CA',
+  'San Francisco, CA',
+];
+
+// =============================================================================
+// 🏗️ Component หลัก — SearchBar
+// =============================================================================
+export default function SearchBar() {
+  // ---------------------------------------------------------------------------
+  // 🎯 State Management
+  // ---------------------------------------------------------------------------
+  // query = ข้อความที่ user พิมพ์ใน search input
+  const [query, setQuery] = useState('');
+
+  // showSuggestions = true เมื่อต้องการแสดง dropdown suggestions
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // ---------------------------------------------------------------------------
+  // 🧭 Router — สำหรับ programmatic navigation
+  // ---------------------------------------------------------------------------
+  // 🔑 Next.js: useRouter() → router.push('/path')
+  // React JS: useNavigate() → navigate('/path')
+  const router = useRouter();
+
+  // ---------------------------------------------------------------------------
+  // 🔍 Filter Suggestions — กรอง suggestions ตาม query ที่พิมพ์
+  // ---------------------------------------------------------------------------
+  // ใช้ .filter() + .includes() เพื่อหา suggestions ที่ตรงกับ query
+  // .toLowerCase() เพื่อให้ case-insensitive (พิมพ์ "bev" ก็เจอ "Beverly")
+  const filtered = SUGGESTIONS.filter((s) =>
+    s.toLowerCase().includes(query.toLowerCase())
+  );
+
+  // ---------------------------------------------------------------------------
+  // 📤 handleSubmit — เมื่อ user กด Enter หรือกดปุ่ม Search
+  // ---------------------------------------------------------------------------
+  const handleSubmit = (e: React.FormEvent) => {
+    // e.preventDefault() — ป้องกัน form submit แบบปกติ (ที่จะ reload หน้า)
+    // 🔑 React JS + Next.js เหมือนกัน: ต้อง preventDefault() ใน form submit เสมอ
+    e.preventDefault();
+
+    if (query.trim()) {
+      // 🔑 Next.js: router.push() — navigate พร้อม query parameter
+      // React JS: navigate(`/listings?location=${encodeURIComponent(query)}`)
+      // encodeURIComponent() แปลงอักขระพิเศษ เช่น space → %20, comma → %2C
+      router.push(`/listings?location=${encodeURIComponent(query.trim())}`);
+    } else {
+      // ถ้าไม่ได้พิมพ์อะไร → ไปหน้า listings เฉยๆ (แสดงทั้งหมด)
+      router.push('/listings');
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+  // 🎯 handleSelect — เมื่อ user คลิกเลือก suggestion จาก dropdown
+  // ---------------------------------------------------------------------------
+  const handleSelect = (suggestion: string) => {
+    // 1. อัพเดท input ให้แสดงค่าที่เลือก
+    setQuery(suggestion);
+    // 2. ปิด dropdown
+    setShowSuggestions(false);
+    // 3. Navigate ไปหน้า listings พร้อม location ที่เลือก
+    // 🔑 Next.js: router.push() / React JS: navigate()
+    router.push(`/listings?location=${encodeURIComponent(suggestion)}`);
+  };
+
+  return (
+    // =========================================================================
+    // 📦 Container — relative เพื่อให้ dropdown วางซ้อนได้ (absolute positioning)
+    // max-w-2xl mx-auto = จำกัดความกว้าง + จัดกลาง
+    // =========================================================================
+    <div className="relative w-full max-w-2xl mx-auto">
+      {/* role="search" บอก screen reader ว่านี่คือ search form */}
+      <form onSubmit={handleSubmit} role="search">
+        {/* Container ของ input + select + button */}
+        {/* rounded-2xl shadow-xl = มุมมน + เงาเพื่อให้ดูลอยขึ้นมา */}
+        <div className="flex items-center bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+
+          {/* ============================================================= */}
+          {/* 📍 Location Input — ช่องค้นหาตามตำแหน่ง                        */}
+          {/* ============================================================= */}
+          <div className="flex-1 flex items-center px-5 py-4 gap-3">
+            {/* Icon pin ตำแหน่ง */}
+            <svg
+              className="w-5 h-5 text-gray-400 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              value={query}
+              // ─────────────────────────────────────────────────────────────
+              // 🔑 Controlled Input — value + onChange
+              // React JS + Next.js เหมือนกัน: ใช้ state ควบคุมค่า input
+              // ─────────────────────────────────────────────────────────────
+              onChange={(e) => {
+                setQuery(e.target.value);
+                // แสดง suggestions เมื่อมีข้อความ (> 0 ตัวอักษร)
+                setShowSuggestions(e.target.value.length > 0);
+              }}
+              // onFocus — แสดง suggestions เมื่อ focus กลับมาที่ input (ถ้ามี query อยู่)
+              onFocus={() => setShowSuggestions(query.length > 0)}
+              // onBlur — ปิด suggestions เมื่อ click ออก
+              // setTimeout 150ms เพื่อให้ onMouseDown ของ suggestion ทำงานก่อน
+              // ถ้าไม่มี delay → dropdown จะปิดก่อนที่ click จะถูก register
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+              placeholder="Search by city, neighborhood, or address..."
+              aria-label="Search properties by location"
+              className="flex-1 outline-none text-gray-900 placeholder-gray-400 text-sm bg-transparent"
+            />
+          </div>
+
+          {/* ============================================================= */}
+          {/* ─── Divider — เส้นคั่นแนวตั้ง                                  */}
+          {/* ============================================================= */}
+          <div className="w-px h-8 bg-gray-200 shrink-0" aria-hidden="true" />
+
+          {/* ============================================================= */}
+          {/* 🏠 Property Type Select — dropdown เลือกประเภทอสังหา            */}
+          {/* ============================================================= */}
+          {/* ⚠️ ตอนนี้เป็น uncontrolled (ไม่มี state) — ยังไม่ได้ใช้ค่า filter */}
+          <div className="px-4">
+            <select
+              aria-label="Property type"
+              className="text-sm text-gray-600 outline-none bg-transparent cursor-pointer py-4"
+            >
+              <option value="">All Types</option>
+              <option value="house">House</option>
+              <option value="villa">Villa</option>
+              <option value="apartment">Apartment</option>
+              <option value="condo">Condo</option>
+            </select>
+          </div>
+
+          {/* Divider */}
+          <div className="w-px h-8 bg-gray-200 shrink-0" aria-hidden="true" />
+
+          {/* ============================================================= */}
+          {/* 🔍 Search Button — type="submit" ทำให้กด Enter ได้              */}
+          {/* ============================================================= */}
+          <button
+            type="submit"
+            className="m-2 px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2"
+          >
+            {/* Icon แว่นขยาย */}
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            Search
+          </button>
+        </div>
+      </form>
+
+      {/* =================================================================== */}
+      {/* 📋 Suggestions Dropdown — Autocomplete รายชื่อเมือง                  */}
+      {/* =================================================================== */}
+      {/* แสดงเมื่อ: showSuggestions === true AND มี suggestions ที่ตรง */}
+      {/* Conditional rendering: condition && <JSX> — ไม่ render ถ้า false */}
+      {showSuggestions && filtered.length > 0 && (
+        <div
+          // absolute top-full = วางใต้ form พอดี (top-full = 100% จากด้านบน parent)
+          // z-50 = อยู่ layer บนสุด ไม่ถูก element อื่นบัง
+          className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50"
+          // role="listbox" + aria-label = accessibility สำหรับ dropdown
+          role="listbox"
+          aria-label="Location suggestions"
+        >
+          {filtered.map((suggestion) => (
+            <button
+              key={suggestion}
+              role="option"
+              aria-selected={false}
+              type="button"
+              // ─────────────────────────────────────────────────────────────
+              // 🔑 ทำไมใช้ onMouseDown แทน onClick?
+              // ─────────────────────────────────────────────────────────────
+              // เพราะ input มี onBlur ที่จะปิด dropdown เมื่อ focus หายไป
+              // ลำดับ event: onBlur (input) → onClick (button)
+              // ถ้าใช้ onClick → dropdown ถูกปิดก่อนที่ click จะทำงาน!
+              // onMouseDown เกิดก่อน onBlur → จึงใช้แทนเพื่อให้ click ทำงานได้
+              // (setTimeout ใน onBlur 150ms ก็ช่วยเพิ่มอีกชั้น)
+              // ─────────────────────────────────────────────────────────────
+              onMouseDown={() => handleSelect(suggestion)}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+            >
+              {/* Icon pin เล็กๆ ข้างหน้าแต่ละ suggestion */}
+              <svg
+                className="w-4 h-4 text-gray-400 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+              </svg>
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

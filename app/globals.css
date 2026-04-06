@@ -1,0 +1,266 @@
+/* =============================================================================
+ * 📁 app/globals.css — ไฟล์ CSS หลักของทั้งโปรเจกต์ + Tailwind v4 Config
+ * =============================================================================
+ *
+ * 🔑 React JS vs Next.js — CSS Entry Point:
+ * ─────────────────────────────────────────────
+ * React JS (CRA):
+ *   - import './index.css' ใน index.tsx (manual import)
+ *   - Tailwind v3: ใส่ @tailwind base/components/utilities 3 บรรทัด
+ *   - Config อยู่ใน tailwind.config.js (JavaScript file แยก)
+ *
+ * Next.js + Tailwind v4 (โปรเจกต์นี้):
+ *   - globals.css ถูก import อัตโนมัติผ่าน app/layout.tsx
+ *   - ใช้ @import "tailwindcss" แทน @tailwind directives
+ *   - ❌ ไม่มี tailwind.config.js — config ทุกอย่างอยู่ในไฟล์ CSS นี้
+ *   - ใช้ @theme {} block แทน theme.extend ใน JS
+ *
+ * 🔑 Tailwind v3 vs v4 — Config Approach:
+ * ─────────────────────────────────────────────
+ * Tailwind v3 (JS-first):
+ *   tailwind.config.js → theme: { extend: { colors: { brand: {...} } } }
+ *   globals.css        → @tailwind base; @tailwind components; @tailwind utilities;
+ *
+ * Tailwind v4 (CSS-first):
+ *   ❌ ไม่มี tailwind.config.js
+ *   globals.css → @import "tailwindcss";
+ *                 @theme { --color-brand-500: oklch(...); }
+ *   → ทุกอย่างอยู่ใน CSS ที่เดียว, ง่ายกว่า, เร็วกว่า
+ * =========================================================================== */
+
+/* =============================================================================
+ * 📦 Tailwind CSS v4 Entry Point
+ * =============================================================================
+ * 🔑 เทียบกับ Tailwind v3:
+ *   v3: ต้องเขียน 3 บรรทัด:
+ *       @tailwind base;         ← reset CSS + base styles
+ *       @tailwind components;   ← component classes (.container etc.)
+ *       @tailwind utilities;    ← utility classes (bg-*, text-*, p-* etc.)
+ *
+ *   v4: เขียนแค่บรรทัดเดียว:
+ *       @import "tailwindcss";  ← รวม base + components + utilities ทั้งหมด
+ *
+ * บรรทัดนี้ทำอะไร:
+ *   1. Reset CSS (normalize) — ทำให้ทุก browser แสดงผลเหมือนกัน
+ *   2. โหลด Tailwind utility classes ทั้งหมด (bg-*, flex, grid, etc.)
+ *   3. เปิดใช้ @theme {} block สำหรับ custom tokens
+ * =========================================================================== */
+@import "tailwindcss";
+
+/* =============================================================================
+ * 🎨 @theme — Custom Design Tokens (แทน tailwind.config.js)
+ * =============================================================================
+ * 🔑 React JS + Tailwind v3 (แบบเดิม):
+ *   // tailwind.config.js
+ *   module.exports = {
+ *     theme: {
+ *       extend: {
+ *         colors: {
+ *           brand: {
+ *             50: '#eff6ff',
+ *             500: '#3b82f6',
+ *           }
+ *         },
+ *         fontFamily: {
+ *           sans: ['Inter', 'sans-serif'],
+ *         },
+ *         borderRadius: {
+ *           card: '0.875rem',
+ *         }
+ *       }
+ *     }
+ *   }
+ *
+ * 🔑 Next.js + Tailwind v4 (โปรเจกต์นี้):
+ *   @theme {
+ *     --color-brand-500: oklch(...);     ← ใช้ CSS variables แทน JS object
+ *     --font-sans: 'Inter', sans-serif;  ← font ก็เป็น CSS variable
+ *     --radius-card: 0.875rem;           ← custom border-radius
+ *   }
+ *
+ * 🔑 ข้อดีของ CSS-first (v4):
+ *   - ไม่ต้อง restart dev server เมื่อเปลี่ยน config (v3 ต้อง restart)
+ *   - เห็น config อยู่ในไฟล์ CSS เลย — ไม่ต้องสลับไป JS
+ *   - CSS variables ใช้ได้ทั้งใน Tailwind classes และ CSS ปกติ
+ *
+ * 🔑 oklch คืออะไร:
+ *   - Color format ใหม่ — Oklab Lightness Chroma Hue
+ *   - ดีกว่า hex (#3b82f6) เพราะ:
+ *     1. Perceptually uniform — ปรับ lightness ได้สม่ำเสมอ
+ *     2. Gamut ที่กว้างกว่า — สีสดกว่า hex ได้
+ *     3. อ่านง่ายกว่า: oklch(0.623 0.214 259) = lightness 62%, chroma 21%, hue 259 deg
+ * =========================================================================== */
+@theme {
+  /* ─────────────────────────────────────────────────────────────────────────
+   * 🔤 Font Family — กำหนดฟอนต์หลักของทั้งเว็บ
+   * ─────────────────────────────────────────────────────────────────────────
+   * var(--font-inter) = CSS variable ที่ Next.js Font สร้างให้ (จาก layout.tsx)
+   * fallback: ui-sans-serif → system-ui → -apple-system → sans-serif
+   *
+   * 🔑 React JS: ต้อง import font เอง (@import url('https://fonts.google.com/...'))
+   * 🔑 Next.js: ใช้ next/font/google → สร้าง CSS variable อัตโนมัติ, ไม่มี FOUT
+   *
+   * เมื่อตั้ง --font-sans → ใช้ class font-sans ใน Tailwind ได้เลย
+   * ─────────────────────────────────────────────────────────────────────────*/
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+   * 🎨 Brand Colors — สีหลักของเว็บไซต์ (โทนน้ำเงิน)
+   * ─────────────────────────────────────────────────────────────────────────
+   * ตั้งชื่อ --color-brand-* → ใช้ใน Tailwind classes ได้:
+   *   bg-brand-500   = background สีหลัก
+   *   text-brand-600 = ตัวอักษรสีเข้ม
+   *   hover:bg-brand-700 = สีตอน hover
+   *
+   * 🔑 Tailwind v3: colors: { brand: { 500: '#3b82f6' } } ใน JS
+   * 🔑 Tailwind v4: --color-brand-500: oklch(...); ใน CSS
+   *   → ผลลัพธ์เหมือนกัน แต่ v4 อยู่ใน CSS ที่เดียว
+   *
+   * Scale: 50 (อ่อนสุด) → 700 (เข้มสุด)
+   * ─────────────────────────────────────────────────────────────────────────*/
+  --color-brand-50: oklch(0.971 0.013 264.5);   /* สีอ่อนมาก — ใช้เป็น background */
+  --color-brand-100: oklch(0.932 0.032 264.5);  /* สีอ่อน — ใช้เป็น hover background */
+  --color-brand-500: oklch(0.623 0.214 259.1);  /* สีหลัก — ปุ่ม, links, accents */
+  --color-brand-600: oklch(0.546 0.245 262.9);  /* สีเข้ม — hover state ของปุ่ม */
+  --color-brand-700: oklch(0.457 0.216 261.0);  /* สีเข้มสุด — active/pressed state */
+
+  /* ─────────────────────────────────────────────────────────────────────────
+   * 📐 Custom Border Radius — มุมโค้งของ card components
+   * ─────────────────────────────────────────────────────────────────────────
+   * ตั้งชื่อ --radius-card → ใช้ class rounded-card ใน Tailwind ได้
+   * 0.875rem = 14px — โค้งมนพอดี ดูทันสมัย
+   *
+   * 🔑 Tailwind v3: borderRadius: { card: '0.875rem' } ใน JS config
+   * 🔑 Tailwind v4: --radius-card: 0.875rem; ใน CSS @theme
+   * ─────────────────────────────────────────────────────────────────────────*/
+  --radius-card: 0.875rem;
+}
+
+/* =============================================================================
+ * 🔧 Global Reset — Box Sizing
+ * =============================================================================
+ * box-sizing: border-box ทำให้ width/height รวม padding + border
+ * ถ้าไม่ตั้ง (content-box): width: 100px + padding: 10px = 120px จริง ← งง!
+ * ตั้ง border-box: width: 100px + padding: 10px = ยังคง 100px ← ง่ายกว่า
+ *
+ * 🔑 React JS + Tailwind v3: Tailwind preflight ตั้งให้แล้ว
+ * 🔑 Tailwind v4: preflight ยังมี แต่เราเขียนซ้ำเพื่อความชัดเจน
+ * =========================================================================== */
+* {
+  box-sizing: border-box;
+}
+
+/* =============================================================================
+ * 🌐 HTML — Smooth Scrolling
+ * =============================================================================
+ * scroll-behavior: smooth ทำให้การเลื่อนหน้า (เช่น กด anchor link) เลื่อนแบบนุ่มนวล
+ * แทนที่จะกระโดดไปทันที
+ *
+ * 🔑 ใช้เหมือนกันทั้ง React JS และ Next.js — เป็น CSS มาตรฐาน
+ * =========================================================================== */
+html {
+  scroll-behavior: smooth;
+}
+
+/* =============================================================================
+ * 📄 Body — Base Styles
+ * =============================================================================
+ * กำหนด style พื้นฐานของ <body>:
+ *   - font-family: ใช้ฟอนต์ที่ตั้งไว้ใน @theme (Inter + fallbacks)
+ *   - background-color: สีพื้นหลังอ่อนๆ (off-white, โทนน้ำเงินนิดๆ)
+ *   - color: สีตัวอักษร (เกือบดำ, โทนน้ำเงินเล็กน้อย)
+ *
+ * 🔑 ใช้ var(--font-sans) ที่ตั้งไว้ใน @theme — CSS variable ใช้ได้ทั้ง Tailwind และ CSS ปกติ
+ * 🔑 สีใช้ oklch — format เดียวกับที่ตั้งใน @theme เพื่อความสม่ำเสมอ
+ * =========================================================================== */
+body {
+  font-family: var(--font-sans);
+  /* ใช้ CSS variable จาก @theme — ฟอนต์ Inter + fallbacks */
+
+  background-color: oklch(0.979 0.005 264.5);
+  /* สีพื้นหลัง: ขาวอมฟ้าอ่อนมาก (lightness 97.9%) */
+
+  color: oklch(0.129 0.042 264.5);
+  /* สีตัวอักษร: เกือบดำ อมน้ำเงินเล็กน้อย (lightness 12.9%) */
+}
+
+/* =============================================================================
+ * 🎚️ Custom Range Slider — Styling สำหรับ <input type="range">
+ * =============================================================================
+ * ใช้ใน FilterSidebar.tsx สำหรับ price range slider
+ *
+ * 🔑 ทำไมต้อง custom style:
+ *   - Default range slider ของแต่ละ browser หน้าตาไม่เหมือนกัน
+ *   - Tailwind ไม่มี utility class สำหรับ slider thumb/track
+ *   - ต้องใช้ CSS pseudo-elements แบบ vendor-specific:
+ *     ::-webkit-slider-thumb = Chrome, Safari, Edge
+ *     ::-moz-range-thumb = Firefox
+ *
+ * 🔑 ใช้เหมือนกันทั้ง React JS และ Next.js — เป็น CSS มาตรฐาน
+ * =========================================================================== */
+
+/* ───────────────────── Track (แถบเลื่อน) ───────────────────── */
+input[type='range'] {
+  -webkit-appearance: none;    /* ลบ default style ของ Chrome/Safari */
+  appearance: none;            /* ลบ default style ของ browser ทั่วไป */
+  height: 4px;                 /* ความสูงของ track = 4px (บาง) */
+  border-radius: 9999px;       /* โค้งมน = วงกลม (pill shape) */
+  background: #e5e7eb;         /* สีเทาอ่อน (gray-200) */
+  outline: none;               /* ลบ focus outline */
+}
+
+/* ───────────────────── Thumb สำหรับ Chrome/Safari/Edge ───────────────────── */
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;    /* ลบ default thumb style */
+  appearance: none;            /* ลบ default style */
+  width: 18px;                 /* ความกว้างของ thumb */
+  height: 18px;                /* ความสูงของ thumb */
+  border-radius: 50%;          /* ทำให้เป็นวงกลม */
+  background: #2563eb;         /* สีน้ำเงิน (blue-600) — สี brand หลัก */
+  cursor: pointer;             /* เปลี่ยน cursor เป็นมือชี้ */
+  border: 2px solid white;     /* ขอบขาว — ทำให้เห็นชัดบน track */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* เงาเล็กน้อย — ดู 3D */
+}
+
+/* ───────────────────── Thumb สำหรับ Firefox ───────────────────── */
+/* 🔑 Firefox ใช้ pseudo-element ต่างจาก Chrome — ต้องเขียนแยก */
+input[type='range']::-moz-range-thumb {
+  width: 18px;                 /* ขนาดเท่ากับ webkit version */
+  height: 18px;
+  border-radius: 50%;          /* วงกลม */
+  background: #2563eb;         /* สีน้ำเงินเดียวกัน */
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* =============================================================================
+ * ✂️ Line Clamp Utilities — ตัดข้อความที่ยาวเกินไป
+ * =============================================================================
+ * ใช้ใน PropertyCard.tsx เพื่อจำกัดจำนวนบรรทัดของ description
+ *
+ * 🔑 Tailwind v3: มี plugin @tailwindcss/line-clamp ต้องติดตั้งเพิ่ม
+ * 🔑 Tailwind v4: built-in แล้ว (line-clamp-* utility)
+ *    แต่เราเขียน custom เผื่อ browser เก่าที่ไม่รองรับ
+ *
+ * วิธีทำงาน:
+ *   -webkit-box + -webkit-line-clamp = ตัดข้อความหลังจากครบ N บรรทัด
+ *   overflow: hidden = ซ่อนส่วนที่เกิน
+ *   แสดง "..." ท้ายบรรทัดสุดท้ายอัตโนมัติ
+ * =========================================================================== */
+
+/* ตัดข้อความให้เหลือ 2 บรรทัด — ใช้กับ description สั้น */
+.line-clamp-2 {
+  display: -webkit-box;            /* ใช้ legacy flexbox (จำเป็นสำหรับ line-clamp) */
+  -webkit-line-clamp: 2;           /* จำกัด 2 บรรทัด */
+  -webkit-box-orient: vertical;    /* เรียงแนวตั้ง */
+  overflow: hidden;                /* ซ่อนส่วนที่เกิน 2 บรรทัด */
+}
+
+/* ตัดข้อความให้เหลือ 3 บรรทัด — ใช้กับ description ยาว */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;           /* จำกัด 3 บรรทัด */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
