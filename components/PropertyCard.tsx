@@ -1,77 +1,15 @@
-// =============================================================================
-// 📁 components/PropertyCard.tsx — การ์ดแสดงข้อมูล Property แต่ละรายการ
-// =============================================================================
-//
-// 🔑 ทำไมต้องเป็น Client Component?
-// ─────────────────────────────────────
-// Component นี้ต้องเป็น 'use client' เพราะ:
-//   1. useState — ใช้เก็บสถานะ bookmark (กดบุ๊กมาร์กหรือยัง)
-//   2. onClick event handler — ปุ่มกด bookmark ต้อง handle event ฝั่ง client
-//
-// 🔑 React JS vs Next.js:
-//   - React JS: ทุก component เป็น client อยู่แล้ว ไม่ต้องประกาศอะไร
-//   - Next.js: default เป็น Server Component → ถ้าจะใช้ useState/useEffect
-//              ต้องประกาศ 'use client' ที่บรรทัดแรกสุดของไฟล์
-//
-// 🔑 Next/Image vs <img> ปกติ:
-// ──────────────────────────────
-//   <img> ปกติ (React JS):
-//     - โหลดรูปเต็มขนาดเสมอ ไม่ว่าจอจะเล็กแค่ไหน
-//     - ไม่มี lazy loading อัตโนมัติ
-//     - ไม่ optimize format (WebP/AVIF)
-//     - CLS (Cumulative Layout Shift) สูง เพราะไม่รู้ขนาดรูปล่วงหน้า
-//
-//   Next/Image:
-//     - Resize รูปอัตโนมัติตามขนาดจอ (ผ่าน sizes prop)
-//     - Lazy loading เป็น default
-//     - แปลง format เป็น WebP/AVIF อัตโนมัติ
-//     - ป้องกัน CLS เพราะจอง space ไว้ล่วงหน้า (ผ่าน fill หรือ width/height)
-//
-// 🔑 Next/Link vs <a> ปกติ:
-// ──────────────────────────
-//   <a href="..."> (HTML ปกติ / React JS ที่ไม่ใช้ React Router):
-//     - Full page reload ทุกครั้งที่คลิก
-//     - โหลด HTML + JS + CSS ใหม่ทั้งหมด
-//
-//   React Router <Link> (React JS):
-//     - Client-side navigation (ไม่ reload หน้า)
-//     - ต้อง install react-router-dom แยก
-//     - ต้อง setup <BrowserRouter> + <Routes> เอง
-//
-//   Next.js <Link>:
-//     - Client-side navigation เหมือน React Router
-//     - Prefetch อัตโนมัติ — เมื่อ Link ปรากฏบนจอ จะโหลด JS ของหน้านั้นล่วงหน้า
-//     - ไม่ต้อง setup router — ใช้ folder structure เป็น route (file-based routing)
-//     - ส่ง href เป็น string ตรง ๆ ได้เลย (ไม่ต้อง to={...} แบบ React Router)
-// =============================================================================
-
 'use client';
-// 🔑 Next.js: ต้องใส่ 'use client' เพราะ component นี้ใช้ useState (bookmark toggle)
-// React JS: ไม่ต้องใส่บรรทัดนี้ เพราะทุก component เป็น client อยู่แล้ว
 
 import { useState } from 'react';
-// useState = React hook สำหรับเก็บ state (สถานะที่เปลี่ยนแปลงได้) ฝั่ง client
-// ใช้เก็บสถานะ bookmarked (true/false) ว่าผู้ใช้กด bookmark หรือยัง
 
 import Image from 'next/image';
-// 🔑 Next/Image — component พิเศษของ Next.js ที่ optimize รูปภาพอัตโนมัติ
-// React JS ปกติ: ใช้ <img src="..." /> ← ไม่มี optimization
-// Next.js: ใช้ <Image src="..." /> ← resize, lazy load, WebP อัตโนมัติ
 
 import Link from 'next/link';
-// 🔑 Next/Link — client-side navigation ไม่ reload หน้า + prefetch อัตโนมัติ
-// React JS ปกติ: ใช้ <Link to="..."> จาก react-router-dom
-// Next.js: ใช้ <Link href="..."> จาก next/link (ใช้ href ไม่ใช่ to)
 
 import type { Property } from '@/lib/mock-data';
 // Import type เฉพาะ type definition — ไม่ถูก include ใน JavaScript output
 // @/ = alias ชี้ไปที่ root ของโปรเจกต์ (ตั้งค่าใน tsconfig.json)
-// 🔑 React JS: ต้อง import แบบ relative path เช่น '../lib/mock-data'
-//    Next.js: ใช้ @/ alias ได้เลย (สั้นกว่า, ไม่ต้องนับ ../ )
 
-// -----------------------------------------------------------------------------
-// 🎨 สี Badge สำหรับแต่ละประเภท Property
-// -----------------------------------------------------------------------------
 // Record<string, string> = TypeScript utility type
 // key = ชื่อประเภท (House, Villa, ...), value = Tailwind classes
 const TYPE_STYLES: Record<string, string> = {
@@ -81,9 +19,6 @@ const TYPE_STYLES: Record<string, string> = {
   Condo: 'bg-amber-100 text-amber-700',
 };
 
-// -----------------------------------------------------------------------------
-// ⭐ StarRating — Sub-component แสดงดาว rating
-// -----------------------------------------------------------------------------
 // เป็น function component ธรรมดา (ไม่ export) ใช้ภายในไฟล์นี้เท่านั้น
 // Props: rating (คะแนน เช่น 4.5), count (จำนวนรีวิว เช่น 120)
 function StarRating({ rating, count }: { rating: number; count: number }) {
@@ -120,29 +55,19 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
   );
 }
 
-// -----------------------------------------------------------------------------
-// 📝 Props Interface — TypeScript กำหนด props ที่ component รับ
-// -----------------------------------------------------------------------------
 interface PropertyCardProps {
   property: Property;      // ข้อมูล property ทั้งหมด (จาก mock-data.ts)
   featured?: boolean;      // optional — ถ้า true จะมี ring สีฟ้ารอบการ์ด
 }
 
-// =============================================================================
-// 🏗️ Component หลัก — PropertyCard
-// =============================================================================
-// 🔑 เปรียบเทียบ export:
-//   React JS: export default function PropertyCard() { ... }  ← เหมือนกัน
-//   Next.js:  export default function PropertyCard() { ... }  ← เหมือนกัน
 //   (ส่วน export เหมือนกันทุกประการ ต่างแค่ 'use client' ด้านบน)
 export default function PropertyCard({ property, featured = false }: PropertyCardProps) {
-  // ---------------------------------------------------------------------------
-  // 🔖 Bookmark State — เก็บว่าผู้ใช้กด bookmark หรือยัง
-  // ---------------------------------------------------------------------------
-  // 🔑 นี่คือเหตุผลที่ต้องเป็น 'use client' — useState ทำงานฝั่ง client เท่านั้น
   // ในโปรเจกต์จริง อาจเก็บใน database หรือ localStorage แทน
   // ตอนนี้เป็น mock — refresh หน้าแล้ว bookmark จะหายไป
   const [bookmarked, setBookmarked] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&auto=format&fit=crop&q=80';
 
   return (
     // <article> = semantic HTML สำหรับเนื้อหาที่สมบูรณ์ในตัวเอง (SEO + Accessibility)
@@ -150,7 +75,6 @@ export default function PropertyCard({ property, featured = false }: PropertyCar
       className={`bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 group ${
         featured ? 'ring-2 ring-blue-100' : ''  // featured property มีขอบสีฟ้า
       }`}
-      // 🔑 group = Tailwind utility — ให้ลูกใช้ group-hover: ได้
       // เช่น รูปภาพ zoom เมื่อ hover ที่การ์ด (ไม่ใช่แค่ hover ที่รูป)
     >
       {/* ================================================================= */}
@@ -166,12 +90,12 @@ export default function PropertyCard({ property, featured = false }: PropertyCar
         {/*   → ประหยัด bandwidth — จอเล็กไม่ต้องโหลดรูปใหญ่              */}
         {/* 🔑 React JS: ใช้ <img src={...} /> ← ไม่มี auto resize        */}
         <Image
-          src={property.images[0]}
+          src={imgError || !property.images[0] ? FALLBACK_IMAGE : property.images[0]}
           alt={`${property.name} — ${property.type} in ${property.location}`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
-          // group-hover:scale-105 = zoom 5% เมื่อ hover ที่ <article> (parent ที่มี group)
+          onError={() => setImgError(true)}
         />
 
         {/* ─────────────────────────────────────────────────────────────── */}
@@ -298,7 +222,7 @@ export default function PropertyCard({ property, featured = false }: PropertyCar
             {property.bathrooms} bath
           </span>
           <span className="text-gray-300">•</span>
-          <span>{property.area.toLocaleString()} ft²</span>
+          <span>{property.area.toLocaleString()} ตร.ม.</span>
           {/* toLocaleString() = ใส่ comma คั่นหลักพัน เช่น 1,500 */}
         </div>
 
@@ -313,10 +237,9 @@ export default function PropertyCard({ property, featured = false }: PropertyCar
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
           <div>
             <span className="text-lg font-bold text-gray-900">
-              ${property.price.toLocaleString()}
+              ฿{property.price.toLocaleString()}
             </span>
             <span className="text-xs text-gray-500">/{property.priceType}</span>
-            {/* เช่น "$2,500/month" */}
           </div>
           {/* 🔑 Link ที่ styled เป็นปุ่ม — navigate ไปหน้า detail โดยไม่ reload */}
           <Link

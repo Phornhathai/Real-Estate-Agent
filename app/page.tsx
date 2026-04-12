@@ -1,112 +1,38 @@
-// =============================================================================
-// 📁 app/page.tsx — Home Page (หน้าแรกของเว็บไซต์)
-// =============================================================================
-//
-// 🔑 React JS vs Next.js — Home Page:
-// ─────────────────────────────────────────────
-// React JS (แบบเดิม):
-//   - หน้าแรกเป็น component ธรรมดา render บน client:
-//     function HomePage() {
-//       const [featured, setFeatured] = useState([]);
-//       useEffect(() => {
-//         fetch('/api/properties?featured=true')
-//           .then(res => res.json())
-//           .then(data => setFeatured(data));
-//       }, []);
-//       return <div>...</div>;
-//     }
-//   - ต้อง fetch data ด้วย useEffect (client-side)
-//   - User เห็นหน้าว่างก่อน → แล้วค่อยเห็น data (loading flash)
-//   - SEO ไม่ดี เพราะ Google เห็น HTML เปล่าก่อน JS render
-//
-// Next.js App Router:
-//   - app/page.tsx = Server Component → render บน server
-//   - ดึง data ได้ตรงๆ (import function แล้วเรียก) ไม่ต้อง useEffect
-//   - HTML ถูก render ครบก่อนส่งให้ browser → SEO ดี, ไม่มี loading flash
-//   - export metadata ได้ → ไม่ต้อง react-helmet
-//
-// 🔑 ไฟล์นี้ทำหน้าที่:
-//   1. แสดง Hero Section พร้อม SearchBar
-//   2. แสดง Stats Bar (จำนวน properties, agents, cities, satisfaction)
-//   3. แสดง Featured Properties (4 ตัวที่ featured=true)
-//   4. แสดง Browse by Location (6 locations)
-//   5. แสดง Why Choose Us features
-//   6. แสดง CTA (Call-to-Action) Section
-//
-// 🔑 Data Flow:
-//   getFeaturedProperties() → return properties ที่ featured=true
-//   → ถูกเรียกใน Server Component → HTML render ครบบน server
-//   → ส่ง HTML สำเร็จรูปให้ browser → ไม่มี loading state
-// =============================================================================
-
-// =============================================================================
-// 📦 Imports
-// =============================================================================
 import type { Metadata } from 'next';
-// Type สำหรับ metadata — กำหนด title, description, OG สำหรับหน้าแรก
-// 🔑 React JS: ใช้ react-helmet หรือ document.title ใน useEffect
 
 import Image from 'next/image';
-// 🔑 next/image vs React JS <img>:
-//   React JS: <img src="..." alt="..." /> — ไม่มี optimization
-//   Next.js:  <Image src="..." alt="..." width={} height={} />
-//     - Lazy loading อัตโนมัติ (โหลดรูปเมื่อ scroll ถึง)
-//     - Responsive images (srcset) อัตโนมัติ
-//     - Convert เป็น WebP/AVIF อัตโนมัติ (ขนาดเล็กกว่า)
-//     - ป้องกัน layout shift (ต้องระบุ width/height หรือ fill)
 
 import Link from 'next/link';
-// 🔑 Next.js Link vs React JS:
-//   React JS: import { Link } from 'react-router-dom' → <Link to="/listings">
-//   Next.js:  import Link from 'next/link'             → <Link href="/listings">
-//     - Next.js Link มี prefetching: โหลดหน้าถัดไปล่วงหน้าเมื่อ link อยู่ใน viewport
-//     - เปลี่ยนหน้าเร็วมากเพราะ data ถูก prefetch แล้ว
 
 import SearchBar from '@/components/SearchBar';
-// Client Component — มี dropdown, useRouter สำหรับ navigate ไป /listings?location=...
-// 🔑 ต้องเป็น Client Component เพราะใช้ useState (dropdown state) + useRouter (navigation)
 
 import PropertyCard from '@/components/PropertyCard';
-// Client Component — แสดงข้อมูล property พร้อม bookmark toggle
-// 🔑 ต้องเป็น Client Component เพราะมี onClick (bookmark toggle)
 
-import { getFeaturedProperties } from '@/lib/mock-data';
-// ฟังก์ชัน helper จาก mock data — return properties ที่ featured=true
-// 🔑 เทียบกับ React JS:
-//   React JS: ต้อง fetch('/api/featured') ใน useEffect แล้ว setState
-//   Next.js:  import แล้วเรียกตรงๆ ใน Server Component (ไม่ต้อง useEffect)
+import { prisma } from '@/lib/prisma';
+import { toProperty } from '@/lib/transform';
 
-// =============================================================================
-// 🏷️ Metadata — SEO สำหรับหน้าแรก
-// =============================================================================
-// 🔑 metadata ที่ export จากหน้านี้จะ override metadata ใน layout.tsx
 //   เฉพาะ fields ที่กำหนด (title, description, openGraph)
 //   fields ที่ไม่ได้กำหนด (เช่น twitter, robots) จะใช้ค่าจาก layout.tsx
 //
-// React JS: ต้องใส่ <Helmet> ใน component:
 //   <Helmet>
-//     <title>AumEstate Studio — Find Your Dream Home</title>
+//     <title>Home Reality — Find Your Dream Home</title>
 //     <meta name="description" content="..." />
 //     <meta property="og:title" content="..." />
 //   </Helmet>
 export const metadata: Metadata = {
-  title: 'AumEstate Studio — Find Your Dream Home',  // title ของหน้าแรก
+  title: 'Home Reality — Find Your Dream Home',  // title ของหน้าแรก
   description:
-    'Discover premium properties for rent and sale across California. Browse luxury villas, modern apartments, family homes, and condos with AumEstate Studio.',
+    'Discover premium properties for rent and sale across Thailand. Browse luxury villas, modern apartments, family homes, and condos with Home Reality.',
   openGraph: {
-    title: 'AumEstate Studio — Find Your Dream Home',
-    description: 'Discover premium properties for rent and sale across California.',
+    title: 'Home Reality — Find Your Dream Home',
+    description: 'Discover premium properties for rent and sale across Thailand.',
     url: 'https://www.aumestatestudio.com',
   },
 };
 
-// =============================================================================
 // 📊 Static Data — ข้อมูลที่ไม่เปลี่ยน (constants)
-// =============================================================================
 
-// ---------------------------------------------------------------------------
 // 📈 Stats — ตัวเลขสถิติที่แสดงใน Stats Bar
-// ---------------------------------------------------------------------------
 const STATS = [
   { value: '2,400+', label: 'Properties Listed' },
   { value: '150+', label: 'Expert Agents' },
@@ -114,9 +40,7 @@ const STATS = [
   { value: '98%', label: 'Client Satisfaction' },
 ];
 
-// ---------------------------------------------------------------------------
 // ✨ Features — จุดเด่นที่แสดงใน "Why Choose Us" section
-// ---------------------------------------------------------------------------
 const FEATURES = [
   {
     icon: (
@@ -156,28 +80,21 @@ const FEATURES = [
   },
 ];
 
-// ---------------------------------------------------------------------------
 // 📍 Locations — ข้อมูล location สำหรับ "Browse by Location" section
-// ---------------------------------------------------------------------------
 const LOCATIONS = [
-  { name: 'Beverly Hills', count: 24, image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&auto=format&fit=crop&q=80' },
-  { name: 'Santa Monica', count: 18, image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&auto=format&fit=crop&q=80' },
-  { name: 'Malibu', count: 12, image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&auto=format&fit=crop&q=80' },
-  { name: 'Los Angeles', count: 86, image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&auto=format&fit=crop&q=80' },
-  { name: 'Pasadena', count: 31, image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&auto=format&fit=crop&q=80' },
-  { name: 'Palm Springs', count: 15, image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&auto=format&fit=crop&q=80' },
+  { name: 'Bangkok', count: 48, image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=400&auto=format&fit=crop&q=80' },
+  { name: 'Chiang Mai', count: 24, image: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&auto=format&fit=crop&q=80' },
+  { name: 'Phuket', count: 31, image: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=400&auto=format&fit=crop&q=80' },
+  { name: 'Pattaya', count: 19, image: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=400&auto=format&fit=crop&q=80' },
+  { name: 'Hua Hin', count: 14, image: 'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=400&auto=format&fit=crop&q=80' },
+  { name: 'Koh Samui', count: 11, image: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57?w=400&auto=format&fit=crop&q=80' },
 ];
 
-// =============================================================================
-// 🏗️ HomePage Component — Server Component (หน้าแรก)
-// =============================================================================
-// 🔑 นี่เป็น Server Component (ไม่มี 'use client'):
 //   - render บน server → HTML สำเร็จรูปส่งให้ browser
 //   - เรียก getFeaturedProperties() ตรงๆ (ไม่ต้อง useEffect + useState)
 //   - ไม่ส่ง JavaScript ของ component นี้ไป client (เบากว่า)
 //   - แต่ SearchBar + PropertyCard เป็น Client Components ที่ hydrate บน client
 //
-// 🔑 React JS: ต้อง fetch data ด้วย useEffect:
 //   const [featured, setFeatured] = useState([]);
 //   const [loading, setLoading] = useState(true);
 //   useEffect(() => {
@@ -187,14 +104,14 @@ const LOCATIONS = [
 //     });
 //   }, []);
 //   if (loading) return <Spinner />;
-export default function HomePage() {
-  // ---------------------------------------------------------------------------
-  // 📦 Data Fetching — ดึงข้อมูล featured properties
-  // ---------------------------------------------------------------------------
-  // 🔑 ใน Server Component เรียก function ได้ตรงๆ — ไม่ต้อง useEffect!
-  //   เพราะ code นี้ run บน server ตอน render → data พร้อมทันที
-  //   React JS: ต้อง useEffect + useState + loading state
-  const featured = getFeaturedProperties();
+export default async function HomePage() {
+  const prismaFeatured = await prisma.property.findMany({
+    where: { featured: true },
+    include: { images: { orderBy: { order: 'asc' } }, agent: true },
+    take: 4,
+    orderBy: { createdAt: 'desc' },
+  });
+  const featured = prismaFeatured.map(toProperty);
 
   return (
     <>
@@ -245,10 +162,10 @@ export default function HomePage() {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-indigo-300">
                 Dream Home
               </span>{' '}
-              in California
+              in Thailand
             </h1>
             <p className="text-lg text-blue-100/80 mb-10 max-w-xl mx-auto">
-              Discover premium properties across California&apos;s most sought-after
+              Discover premium properties across Thailand&apos;s most sought-after
               neighborhoods. Your perfect home is just a search away.
             </p>
 
@@ -260,10 +177,9 @@ export default function HomePage() {
             {/* Popular Searches — ลิงก์ไปหน้า listings พร้อม filter */}
             <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
               <span className="text-sm text-white/50">Popular:</span>
-              {['Beverly Hills', 'Santa Monica', 'Malibu', 'Palm Springs'].map((loc) => (
+              {['Bangkok', 'Chiang Mai', 'Phuket', 'Hua Hin'].map((loc) => (
                 <Link
                   key={loc}
-                  // 🔑 Next.js Link: ใช้ href (ไม่ใช่ to เหมือน react-router)
                   // encodeURIComponent แปลงช่องว่างเป็น %20 สำหรับ URL
                   href={`/listings?location=${encodeURIComponent(loc)}`}
                   className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs rounded-full border border-white/10 transition-colors"
@@ -328,7 +244,6 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {featured.map((property) => (
               // PropertyCard = Client Component (มี bookmark toggle)
-              // 🔑 Server Component ส่ง data (property) ให้ Client Component ผ่าน props
               <PropertyCard key={property.id} property={property} featured />
             ))}
           </div>
@@ -359,7 +274,7 @@ export default function HomePage() {
               Browse by Location
             </h2>
             <p className="text-gray-500 mt-2">
-              Explore properties in California&apos;s most desirable neighborhoods
+              Explore properties in Thailand&apos;s most desirable neighborhoods
             </p>
           </div>
 
@@ -400,7 +315,7 @@ export default function HomePage() {
           <div className="text-center mb-12">
             <p className="text-blue-600 font-medium text-sm mb-2">✦ Why Us</p>
             <h2 id="features-heading" className="text-3xl font-bold text-gray-900">
-              The AumEstate Advantage
+              The Home Reality Advantage
             </h2>
             <p className="text-gray-500 mt-2 max-w-lg mx-auto">
               We combine technology with local expertise to deliver an unmatched property

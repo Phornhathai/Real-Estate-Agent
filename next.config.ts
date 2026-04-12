@@ -70,14 +70,20 @@ const nextConfig: NextConfig = {
     // 🔑 Next.js: ต้องระบุทุกโดเมน เพื่อป้องกัน Server-Side Request Forgery (SSRF)
     remotePatterns: [
       {
-        protocol: 'https',                   // ใช้ HTTPS เท่านั้น (ปลอดภัย)
-        hostname: 'images.unsplash.com',      // โดเมนหลักของ Unsplash
-        // Unsplash = แหล่งรูปฟรีที่ใช้ในโปรเจกต์นี้ (mock data)
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       },
       {
-        protocol: 'https',                   // ใช้ HTTPS เท่านั้น
-        hostname: 'plus.unsplash.com',        // โดเมน Unsplash+ (รูป premium)
-        // บาง property ในโปรเจกต์ใช้รูปจาก plus.unsplash.com
+        protocol: 'https',
+        hostname: 'plus.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.qrserver.com',  // QR Code generator
       },
     ],
   },

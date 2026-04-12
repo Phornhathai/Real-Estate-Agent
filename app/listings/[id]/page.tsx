@@ -1,141 +1,57 @@
-// =============================================================================
-// 📁 app/listings/[id]/page.tsx — Property Detail Page (Dynamic Route)
-// =============================================================================
-//
-// 🔑 Dynamic Routes: React JS vs Next.js
-// ─────────────────────────────────────────────
-// React JS (react-router-dom):
-//   - กำหนด route ใน App.tsx: <Route path="/listings/:id" element={<PropertyDetail />} />
-//   - อ่าน params: const { id } = useParams()
-//   - ต้อง fetch data เอง: useEffect(() => { fetchProperty(id) }, [id])
-//   - SEO ทำได้ยาก — ต้องใช้ react-helmet + SSR framework เพิ่ม
-//
-// Next.js (App Router):
-//   - โฟลเดอร์ [id] = dynamic segment → URL /listings/123 จะจับ id = "123"
-//   - params เป็น Promise (Next.js 15+) → ต้อง await params
-//   - import data ตรงจาก lib ได้เลย (Server Component ไม่ต้อง fetch)
-//   - SEO ในตัว: generateMetadata() สร้าง <title>, og:image อัตโนมัติ
-//   - SSG ในตัว: generateStaticParams() pre-render ทุกหน้าตอน build
-//
-// 🔑 ไฟล์นี้เป็น Server Component (async function):
-//   - ไม่มี 'use client' → Next.js จะ render บน server
-//   - สามารถ await params, เรียก async function ได้โดยตรง
-//   - React JS ปกติทำแบบนี้ไม่ได้ — ต้องใช้ useEffect + useState
-//
-// 🔑 Concepts สำคัญในไฟล์นี้:
-//   1. generateStaticParams() — SSG: บอก Next.js ว่ามี [id] อะไรบ้าง
-//   2. generateMetadata()     — Dynamic SEO: สร้าง metadata ต่อหน้า
-//   3. await params           — Next.js 15+: params เป็น Promise
-//   4. notFound()             — Redirect ไปหน้า 404 อัตโนมัติ
-//   5. JSON-LD                — Structured Data สำหรับ Google Search
-// =============================================================================
-
-// =============================================================================
-// 📦 Imports
-// =============================================================================
-
 import type { Metadata } from 'next';
-// Metadata = type ของ Next.js สำหรับ SEO metadata (title, description, openGraph)
-// 🔑 React JS: ไม่มี type นี้ — ต้องใช้ react-helmet: <Helmet><title>...</title></Helmet>
 
 import Link from 'next/link';
-// Link = component สำหรับ client-side navigation (ไม่ reload หน้า)
-// 🔑 React JS: ใช้ <Link to="/path"> จาก react-router-dom
-// 🔑 Next.js: ใช้ <Link href="/path"> — prop ชื่อ href ไม่ใช่ to
 
 import Image from 'next/image';
-// Image = component ที่ optimize รูปอัตโนมัติ (lazy load, resize, WebP)
-// 🔑 React JS: ใช้ <img src="..." /> ธรรมดา — ไม่ optimize ให้
 
 import { notFound } from 'next/navigation';
-// notFound() = ฟังก์ชันที่เรียกแล้ว redirect ไปหน้า 404 (app/not-found.tsx)
-// 🔑 React JS: ต้อง navigate เอง: navigate('/404') หรือ return <NotFound />
 
-import { properties, getPropertyById } from '@/lib/mock-data';
-// properties = array ข้อมูล property ทั้ง 12 ตัว (ใช้ใน generateStaticParams)
-// getPropertyById = หา property จาก id (ใช้ใน page component + generateMetadata)
-// 🔑 React JS: ต้อง fetch จาก API — ใช้ useEffect + useState
-// 🔑 Next.js (Server Component): import ตรงจาก lib ได้เลย — ไม่ต้อง fetch
-
+import { prisma } from '@/lib/prisma';
+import { toProperty } from '@/lib/transform';
 import ImageGallery from '@/components/ImageGallery';
 // ImageGallery = Client Component สำหรับ lightbox gallery (มี 'use client')
-// 🔑 Server Component สามารถ render Client Component ได้ — แค่ใส่เป็น children
 
-// =============================================================================
 // 📐 TypeScript Interface สำหรับ Props
-// =============================================================================
 
-// 🔑 Next.js 15+: params เป็น Promise — ต้อง await ก่อนใช้
-// 🔑 Next.js 14 และก่อนหน้า: params เป็น object ธรรมดา ไม่ต้อง await
-// 🔑 React JS (react-router): useParams() return object ธรรมดาเลย
 interface Props {
   params: Promise<{ id: string }>;
   // params.id = ค่าจาก URL segment [id]
   // เช่น /listings/prop-001 → id = "prop-001"
 }
 
-// =============================================================================
-// 🏗️ generateStaticParams — Static Site Generation (SSG)
-// =============================================================================
-// 🔑 ฟังก์ชันนี้มีเฉพาะ Next.js — React JS ไม่มี concept นี้
 //
 // ทำอะไร: บอก Next.js ตอน build ว่ามี [id] อะไรบ้าง
 // ผลลัพธ์: Next.js จะ pre-render HTML ของทุก id ล่วงหน้า (SSG)
 //          → /listings/prop-001, /listings/prop-002, ... ถูกสร้างเป็น HTML พร้อมใช้
 //
-// 🔑 เทียบกับ React JS:
-//   React JS: ไม่มี SSG — ทุกหน้า render ฝั่ง client ทุกครั้ง
-//   Next.js:  pre-render ตอน build → โหลดเร็วกว่า, SEO ดีกว่า
 //
-// 🔑 ถ้าไม่ใส่ generateStaticParams:
-//   Next.js จะ render แบบ dynamic (SSR) แทน — ช้ากว่า SSG
-// =============================================================================
-export async function generateStaticParams() {
-  // return array ของ object ที่มี key ตรงกับ dynamic segment [id]
-  // Next.js จะวนลูปสร้างหน้า static ให้ทุก property
-  return properties.map((p) => ({ id: p.id }));
-}
 
-// =============================================================================
-// 🏷️ generateMetadata — Dynamic SEO Metadata ต่อหน้า
-// =============================================================================
-// 🔑 ฟังก์ชันนี้มีเฉพาะ Next.js — React JS ต้องใช้ react-helmet แทน
 //
 // ทำอะไร: สร้าง <title>, <meta description>, <meta og:*> แบบ dynamic
 //          แต่ละ property จะได้ metadata ไม่ซ้ำกัน
 //
-// 🔑 เทียบกับ React JS:
-//   React JS: <Helmet><title>{property.name}</title></Helmet>
 //             → render ฝั่ง client → bot อาจอ่านไม่ทัน
-//   Next.js:  generateMetadata() render ฝั่ง server → bot อ่านได้ทันที
 //
-// 🔑 Next.js 15+: params เป็น Promise → ต้อง await
-// 🔑 return type เป็น Promise<Metadata> เพราะเป็น async function
-// =============================================================================
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // ─── ดึง id จาก URL params (ต้อง await เพราะเป็น Promise ใน Next.js 15+) ───
   const { id } = await params;
-
-  // ─── หา property จาก id ───
-  const property = getPropertyById(id);
-
-  // ─── ถ้าไม่เจอ property → return metadata default ───
+  const raw = await prisma.property.findUnique({
+    where: { id },
+    include: { images: { orderBy: { order: 'asc' } }, agent: true },
+  });
+  const property = raw ? toProperty(raw) : null;
   if (!property) {
     return { title: 'Property Not Found' };
   }
-
-  // ─── สร้าง metadata object สำหรับ SEO ───
   return {
     // title จะกลายเป็น <title> ใน HTML head
     title: `${property.name} — ${property.type} in ${property.location}`,
 
     // description จะกลายเป็น <meta name="description">
-    description: `${property.bedrooms} bed, ${property.bathrooms} bath ${property.type.toLowerCase()} in ${property.location}. ${property.area.toLocaleString()} sq ft · $${property.price.toLocaleString()}/${property.priceType}. ${property.description.slice(0, 100)}...`,
+    description: `${property.bedrooms} bed, ${property.bathrooms} bath ${property.type.toLowerCase()} in ${property.location}. ${property.area.toLocaleString()} ตร.ม. · ฿${property.price.toLocaleString()}/${property.priceType}. ${property.description.slice(0, 100)}...`,
 
     // openGraph = metadata สำหรับ Facebook, LINE, Twitter เวลาแชร์ลิงก์
-    // 🔑 React JS: ต้องใช้ react-helmet + SSR ถึงจะทำงานได้กับ social media crawlers
     openGraph: {
-      title: `${property.name} | AumEstate Studio`,
+      title: `${property.name} | Home Reality`,
       description: property.description.slice(0, 200),
       url: `https://www.aumestatestudio.com/listings/${property.id}`,
       images: [
@@ -150,9 +66,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// =============================================================================
-// 🎨 Constants — สีของ badge ตามประเภทอสังหาฯ
-// =============================================================================
 // Record<string, string> = TypeScript type สำหรับ object ที่ key เป็น string, value เป็น string
 const TYPE_COLORS: Record<string, string> = {
   House: 'bg-emerald-100 text-emerald-700',
@@ -161,9 +74,6 @@ const TYPE_COLORS: Record<string, string> = {
   Condo: 'bg-amber-100 text-amber-700',
 };
 
-// =============================================================================
-// ⭐ StarRating — Component แสดงดาว rating (ใช้เฉพาะในไฟล์นี้)
-// =============================================================================
 // ไม่ได้ export ออกไป — เป็น helper component ภายใน
 // ไม่ต้อง 'use client' เพราะไม่มี state/hooks — render บน server ได้
 function StarRating({ rating }: { rating: number }) {
@@ -188,16 +98,10 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-// =============================================================================
-// 🏗️ PropertyDetailPage — Page Component หลัก (Server Component, async)
-// =============================================================================
-// 🔑 นี่คือ Server Component:
 //   - เป็น async function → สามารถ await ได้โดยตรง
 //   - ไม่มี 'use client' → render บน server
 //   - import data จาก lib ได้เลย → ไม่ต้อง useEffect + fetch
 //
-// 🔑 เทียบกับ React JS:
-//   React JS:
 //     function PropertyDetail() {
 //       const { id } = useParams();
 //       const [property, setProperty] = useState(null);
@@ -212,7 +116,6 @@ function StarRating({ rating }: { rating: number }) {
 //       return (...);
 //     }
 //
-//   Next.js:
 //     async function PropertyDetailPage({ params }) {
 //       const { id } = await params;
 //       const property = getPropertyById(id);
@@ -220,47 +123,32 @@ function StarRating({ rating }: { rating: number }) {
 //       return (...);
 //     }
 //     → สั้นกว่ามาก, ไม่ต้อง loading state, SEO ดีกว่า
-// =============================================================================
 export default async function PropertyDetailPage({ params }: Props) {
-  // ─── ดึง id จาก URL params ───
-  // 🔑 Next.js 15+: params เป็น Promise → ต้อง await
-  // 🔑 Next.js 14: const { id } = params; (ไม่ต้อง await)
-  // 🔑 React JS: const { id } = useParams(); (ใช้ hook)
   const { id } = await params;
-
-  // ─── หา property จาก id ───
-  // 🔑 Server Component: import function จาก lib แล้วเรียกตรง ไม่ต้อง fetch API
-  // 🔑 React JS: ต้อง fetch('/api/properties/' + id) ใน useEffect
-  const property = getPropertyById(id);
-
-  // ─── ถ้าไม่เจอ → ไปหน้า 404 ───
-  // 🔑 notFound() = built-in function ของ Next.js
+  const raw = await prisma.property.findUnique({
+    where: { id },
+    include: { images: { orderBy: { order: 'asc' } }, agent: true },
+  });
+  const property = raw ? toProperty(raw) : null;
   //   → redirect ไปแสดง app/not-found.tsx อัตโนมัติ
   //   → ส่ง HTTP 404 status code ที่ถูกต้อง (สำคัญสำหรับ SEO)
-  // 🔑 React JS: ต้อง navigate('/404') หรือ return <Navigate to="/404" />
   //   → ไม่ส่ง HTTP 404 จริงๆ (SPA ส่ง 200 เสมอ ถ้าไม่มี SSR)
   if (!property) {
     notFound();
   }
 
-  // ===========================================================================
   // 📊 JSON-LD Structured Data — ข้อมูลสำหรับ Google Search
-  // ===========================================================================
-  // 🔑 JSON-LD (JavaScript Object Notation for Linked Data):
   //   - เป็น format ที่ Google แนะนำสำหรับ structured data
   //   - ช่วยให้ Google เข้าใจเนื้อหาหน้าเว็บ → แสดง rich results (snippet พิเศษ)
   //   - ใส่ใน <script type="application/ld+json"> ใน HTML
   //
-  // 🔑 React JS: ต้องใช้ react-helmet ใส่ <script> ใน <head>
   //   → แต่ถ้าไม่มี SSR, Google bot อาจอ่านไม่ทัน
-  // 🔑 Next.js: Server Component render HTML พร้อม JSON-LD ตั้งแต่แรก
   //   → Google bot อ่านได้ทันที
   //
-  // Schema ที่ใช้: https://schema.org/RealEstateListing
-  // ===========================================================================
+  // Schema ที่ใช้: https://schema.org/Home RealityListing
   const jsonLd = {
     '@context': 'https://schema.org',          // บอก Google ว่าใช้ schema.org
-    '@type': 'RealEstateListing',               // ประเภท: ประกาศอสังหาริมทรัพย์
+    '@type': 'Home RealityListing',               // ประเภท: ประกาศอสังหาริมทรัพย์
     name: property.name,                         // ชื่อ property
     description: property.description,           // คำอธิบาย
     url: `https://www.aumestatestudio.com/listings/${property.id}`, // URL ของหน้านี้
@@ -268,11 +156,11 @@ export default async function PropertyDetailPage({ params }: Props) {
     offers: {
       '@type': 'Offer',
       price: property.price,                    // ราคา
-      priceCurrency: 'USD',                     // สกุลเงิน
+      priceCurrency: 'THB',                     // สกุลเงิน
       priceSpecification: {
         '@type': 'UnitPriceSpecification',
         price: property.price,
-        priceCurrency: 'USD',
+        priceCurrency: 'THB',
         unitText: property.priceType === 'month' ? 'MON' : 'ANN', // ต่อเดือน/ต่อปี
       },
       // availability: InStock = ว่างอยู่, OutOfStock = ไม่ว่าง
@@ -285,7 +173,7 @@ export default async function PropertyDetailPage({ params }: Props) {
       streetAddress: property.address,           // ที่อยู่
       addressLocality: property.city,            // เมือง
       addressRegion: property.state,             // รัฐ
-      addressCountry: 'US',
+      addressCountry: 'TH',
     },
     geo: {
       '@type': 'GeoCoordinates',
@@ -299,16 +187,13 @@ export default async function PropertyDetailPage({ params }: Props) {
       unitCode: 'FTK',                           // หน่วย: ตารางฟุต
     },
     agent: {
-      '@type': 'RealEstateAgent',
+      '@type': 'Home RealityAgent',
       name: property.agent.name,                 // ชื่อ agent
       email: property.agent.email,
       telephone: property.agent.phone,
     },
   };
 
-  // ===========================================================================
-  // 🖼️ Render — JSX ที่จะถูก render เป็น HTML
-  // ===========================================================================
   return (
     <>
       {/* ================================================================= */}
@@ -414,7 +299,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 {/* ราคา (มุมขวา) */}
                 <div className="text-right">
                   <div className="text-3xl font-bold text-blue-600">
-                    ${property.price.toLocaleString()}
+                    ฿{property.price.toLocaleString()}
                   </div>
                   <div className="text-sm text-gray-500">per {property.priceType}</div>
                 </div>
@@ -460,7 +345,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </svg>
                   ),
                   label: 'Living Area',
-                  value: `${property.area.toLocaleString()} ft²`,
+                  value: `${property.area.toLocaleString()} ตร.ม.`,
                 },
                 {
                   icon: (
@@ -469,7 +354,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </svg>
                   ),
                   label: 'Land Area',
-                  value: property.landArea > 0 ? `${property.landArea.toLocaleString()} ft²` : 'N/A',
+                  value: property.landArea > 0 ? `${property.landArea.toLocaleString()} ตร.ม.` : 'N/A',
                 },
               ].map((spec) => (
                 <div
@@ -599,13 +484,13 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* ราคาและที่ตั้ง */}
               <div className="mb-4">
                 <div className="text-3xl font-bold text-gray-900">
-                  ${property.price.toLocaleString()}
+                  ฿{property.price.toLocaleString()}
                   <span className="text-base font-normal text-gray-500">/{property.priceType}</span>
                 </div>
                 <div className="text-sm text-gray-500 mt-1">{property.location}</div>
               </div>
 
-              {/* Quick Specs — 3 คอลัมน์: Beds / Baths / ft² */}
+              {/* Quick Specs — 3 คอลัมน์: Beds / Baths / ตร.ม. */}
               <div className="grid grid-cols-3 gap-3 mb-5 py-4 border-y border-gray-100">
                 <div className="text-center">
                   <div className="font-bold text-gray-900">{property.bedrooms}</div>
@@ -617,7 +502,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </div>
                 <div className="text-center">
                   <div className="font-bold text-gray-900">{property.area.toLocaleString()}</div>
-                  <div className="text-xs text-gray-500">ft²</div>
+                  <div className="text-xs text-gray-500">ตร.ม.</div>
                 </div>
               </div>
 
@@ -654,7 +539,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900">{property.agent.name}</div>
-                  <div className="text-sm text-gray-500">Licensed Real Estate Agent</div>
+                  <div className="text-sm text-gray-500">Licensed Home Reality Agent</div>
                   {/* Rating + Listings + Experience */}
                   <div className="flex items-center gap-1 mt-1">
                     <svg className="w-3.5 h-3.5 text-amber-400 fill-amber-400" viewBox="0 0 24 24" aria-hidden="true">

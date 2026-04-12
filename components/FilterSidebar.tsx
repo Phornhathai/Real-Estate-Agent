@@ -1,52 +1,10 @@
-// =============================================================================
-// 📁 components/FilterSidebar.tsx — Sidebar ตัวกรอง Property
-// =============================================================================
-//
-// 🔑 State Management Pattern — "Lifting State Up"
-// ──────────────────────────────────────────────────
-// Component นี้ **ไม่ได้เก็บ state เอง** — รับ filters + onChange จาก parent
-// (ListingsClient.tsx) แล้วส่งค่ากลับผ่าน onChange callback
-//
-// ทำไมถึงออกแบบแบบนี้?
-//   - FilterSidebar = "Controlled Component" — parent ควบคุม state ทั้งหมด
-//   - ListingsClient ต้องรู้ค่า filter เพื่อ filter properties ที่จะแสดง
-//   - ถ้า FilterSidebar เก็บ state เอง → ListingsClient จะไม่รู้ว่า filter เปลี่ยน
-//   - Pattern นี้เหมือนกันทั้ง React JS และ Next.js
-//
-// Data Flow:
-//   ListingsClient (parent) ──filters──→ FilterSidebar (child)
-//   ListingsClient (parent) ←──onChange── FilterSidebar (child)
-//
-// 🔑 Export สำคัญจากไฟล์นี้:
-// ────────────────────────────
-//   1. FilterValues (interface) — type definition สำหรับ filters object
-//   2. DEFAULT_FILTERS (const) — ค่าเริ่มต้นของ filters ทั้งหมด
-//   3. FilterSidebar (default) — component ตัว sidebar
-//
-//   → ListingsClient import ทั้ง FilterValues และ DEFAULT_FILTERS ไปใช้
-//     เพราะ ListingsClient เป็นคนเก็บ state จริง ๆ (useState<FilterValues>)
-//
-// 🔑 React JS vs Next.js:
-//   - React JS: ทุก component เป็น client → ไม่ต้อง 'use client'
-//   - Next.js: ต้องใส่ 'use client' เพราะ:
-//     1. onChange callback = event handler (ทำงานฝั่ง browser)
-//     2. onClick, onChange ของ input/button ทั้งหมด
-// =============================================================================
-
 'use client';
-// 🔑 Next.js: ต้องใส่ 'use client' เพราะ component นี้มี event handlers
-// (onClick, onChange) ที่ต้องทำงานฝั่ง browser
-// React JS: ไม่ต้องใส่บรรทัดนี้
 
 import type { PropertyType } from '@/lib/mock-data';
 // Import เฉพาะ type — ไม่เพิ่มขนาด JS bundle
 // PropertyType = 'House' | 'Villa' | 'Apartment' | 'Condo' (union type)
 
-// =============================================================================
-// 📝 FilterValues Interface — โครงสร้างข้อมูล filter ทั้งหมด
-// =============================================================================
 // export เพราะ ListingsClient.tsx ต้อง import ไปใช้เป็น type ของ useState
-// 🔑 Pattern นี้เหมือนกันทั้ง React JS และ Next.js — TypeScript interface ไม่ขึ้นกับ framework
 export interface FilterValues {
   location: string;           // คำค้นหาสถานที่ เช่น "Bangkok"
   priceMin: number;           // ราคาต่ำสุด เช่น 0
@@ -57,14 +15,8 @@ export interface FilterValues {
   amenities: string[];        // สิ่งอำนวยความสะดวกที่เลือก เช่น ['Pool', 'Gym']
 }
 
-// -----------------------------------------------------------------------------
-// 📋 ตัวเลือกประเภท Property — ใช้ render ปุ่ม toggle
-// -----------------------------------------------------------------------------
 const PROPERTY_TYPES: PropertyType[] = ['House', 'Villa', 'Apartment', 'Condo'];
 
-// -----------------------------------------------------------------------------
-// 📋 ตัวเลือก Amenities — ใช้ render checkbox list
-// -----------------------------------------------------------------------------
 const AMENITY_OPTIONS = [
   'Pool',
   'Garden',
@@ -80,22 +32,15 @@ const AMENITY_OPTIONS = [
   'Parking',
 ];
 
-// -----------------------------------------------------------------------------
-// 📝 Props Interface — สิ่งที่ parent (ListingsClient) ส่งมาให้
-// -----------------------------------------------------------------------------
 interface FilterSidebarProps {
   filters: FilterValues;                    // ค่า filter ปัจจุบัน (controlled by parent)
   onChange: (filters: FilterValues) => void; // callback เมื่อ filter เปลี่ยน → ส่งกลับ parent
   resultCount: number;                       // จำนวนผลลัพธ์หลัง filter — แสดงใน header
 }
 
-// =============================================================================
-// 📦 DEFAULT_FILTERS — ค่าเริ่มต้นของ filter ทั้งหมด
-// =============================================================================
 // export เพราะ ListingsClient.tsx ต้อง import ไปใช้ตอน:
 //   1. สร้าง initial state: useState<FilterValues>({ ...DEFAULT_FILTERS })
 //   2. Reset filters: setFilters(DEFAULT_FILTERS)
-// 🔑 Pattern: แยก default values ออกมาเป็น constant → ใช้ซ้ำได้หลายที่
 //    ไม่ต้อง hardcode ค่าเดิมซ้ำทั้งใน FilterSidebar และ ListingsClient
 export const DEFAULT_FILTERS: FilterValues = {
   location: '',
@@ -107,22 +52,13 @@ export const DEFAULT_FILTERS: FilterValues = {
   amenities: [],
 };
 
-// =============================================================================
-// 🏗️ Component หลัก — FilterSidebar
-// =============================================================================
 export default function FilterSidebar({ filters, onChange, resultCount }: FilterSidebarProps) {
-  // ---------------------------------------------------------------------------
   // 🔧 Helper: update — อัปเดตเฉพาะ field ที่เปลี่ยน แล้วส่งกลับ parent
-  // ---------------------------------------------------------------------------
   // Partial<FilterValues> = อนุญาตให้ส่งแค่บาง field ก็ได้
   // เช่น update({ location: 'Bangkok' }) → ส่ง { ...filters, location: 'Bangkok' } กลับ
-  // 🔑 Pattern: Spread operator (...) merge ของเดิมกับของใหม่
-  //    เหมือนกันทั้ง React JS และ Next.js
   const update = (patch: Partial<FilterValues>) => onChange({ ...filters, ...patch });
 
-  // ---------------------------------------------------------------------------
   // 🔧 Helper: toggleType — เปิด/ปิด property type ที่เลือก
-  // ---------------------------------------------------------------------------
   // ถ้า type อยู่ใน array แล้ว → เอาออก (filter)
   // ถ้ายังไม่อยู่ → เพิ่มเข้าไป (spread + append)
   const toggleType = (type: PropertyType) => {
@@ -132,9 +68,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Filter
     update({ types });
   };
 
-  // ---------------------------------------------------------------------------
   // 🔧 Helper: toggleAmenity — เปิด/ปิด amenity ที่เลือก (logic เหมือน toggleType)
-  // ---------------------------------------------------------------------------
   const toggleAmenity = (amenity: string) => {
     const amenities = filters.amenities.includes(amenity)
       ? filters.amenities.filter((a) => a !== amenity)
@@ -142,14 +76,9 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Filter
     update({ amenities });
   };
 
-  // ---------------------------------------------------------------------------
   // 🔧 Helper: resetFilters — ล้าง filter ทั้งหมดกลับค่าเริ่มต้น
-  // ---------------------------------------------------------------------------
   const resetFilters = () => onChange(DEFAULT_FILTERS);
 
-  // ---------------------------------------------------------------------------
-  // 🔍 ตรวจสอบว่ามี filter ที่ active อยู่ไหม — ถ้ามีจะแสดงปุ่ม "Reset all"
-  // ---------------------------------------------------------------------------
   // เทียบทุก field กับค่าเริ่มต้น — ถ้า field ไหนต่างจาก default = มี filter active
   const hasActiveFilters =
     filters.location !== '' ||
@@ -160,9 +89,6 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Filter
     filters.types.length > 0 ||
     filters.amenities.length > 0;
 
-  // ---------------------------------------------------------------------------
-  // 🎨 Render UI
-  // ---------------------------------------------------------------------------
   return (
     <aside
       className="w-full lg:w-72 shrink-0 bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-6 h-fit lg:sticky lg:top-24"
@@ -251,7 +177,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Filter
           <label className="text-sm font-medium text-gray-700">Price Range</label>
           {/* แสดงช่วงราคาปัจจุบัน */}
           <span className="text-xs text-gray-500">
-            ${filters.priceMin.toLocaleString()} – ${filters.priceMax.toLocaleString()}
+            ฿{filters.priceMin.toLocaleString()} – ฿{filters.priceMax.toLocaleString()}
             <span className="text-gray-400">/mo</span>
           </span>
         </div>
@@ -273,7 +199,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Filter
                 update({ priceMin: Math.min(Number(e.target.value), filters.priceMax - 500) })
               }
               className="w-full accent-blue-600"
-              aria-label={`Minimum price: $${filters.priceMin}`}
+              aria-label={`Minimum price: ฿${filters.priceMin}`}
             />
           </div>
           {/* Max Price Slider */}
@@ -293,7 +219,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Filter
                 update({ priceMax: Math.max(Number(e.target.value), filters.priceMin + 500) })
               }
               className="w-full accent-blue-600"
-              aria-label={`Maximum price: $${filters.priceMax}`}
+              aria-label={`Maximum price: ฿${filters.priceMax}`}
             />
           </div>
           {/* Number Inputs — สำหรับพิมพ์ตัวเลขตรง ๆ */}
@@ -325,7 +251,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Filter
         <div className="flex items-center justify-between mb-2">
           <label className="text-sm font-medium text-gray-700">Property Area</label>
           <span className="text-xs text-gray-500">
-            {filters.areaMin.toLocaleString()} – {filters.areaMax.toLocaleString()} ft²
+            {filters.areaMin.toLocaleString()} – {filters.areaMax.toLocaleString()} ตร.ม.
           </span>
         </div>
         <div className="space-y-2">
@@ -337,14 +263,14 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Filter
             value={filters.areaMax}
             onChange={(e) => update({ areaMax: Number(e.target.value) })}
             className="w-full accent-blue-600"
-            aria-label={`Maximum area: ${filters.areaMax} square feet`}
+            aria-label={`Maximum area: ${filters.areaMax} ตร.ม.`}
           />
           <div className="flex gap-2">
             <input
               type="number"
               value={filters.areaMin}
               onChange={(e) => update({ areaMin: Number(e.target.value) })}
-              placeholder="Min ft²"
+              placeholder="Min ตร.ม."
               aria-label="Minimum area input"
               className="w-1/2 px-2.5 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -352,7 +278,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Filter
               type="number"
               value={filters.areaMax}
               onChange={(e) => update({ areaMax: Number(e.target.value) })}
-              placeholder="Max ft²"
+              placeholder="Max ตร.ม."
               aria-label="Maximum area input"
               className="w-1/2 px-2.5 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

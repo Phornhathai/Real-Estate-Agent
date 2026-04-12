@@ -1,0 +1,89 @@
+// =============================================================================
+// 📁 prisma/schema.prisma — Database Schema
+// =============================================================================
+// กำหนดโครงสร้าง database ทั้งหมด
+// Prisma จะแปลง schema นี้เป็น SQL และสร้าง TypeScript types ให้อัตโนมัติ
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// =============================================================================
+// 👤 Agent — ตัวแทนอสังหาริมทรัพย์
+// =============================================================================
+model Agent {
+  id            String     @id @default(cuid())
+  name          String
+  phone         String
+  email         String     @unique
+  avatar        String     // URL รูปโปรไฟล์ (จาก Cloudinary)
+  rating        Float      @default(0)
+  totalListings Int        @default(0)
+  experience    Int        @default(0)
+  bio           String
+
+  // relation: Agent มีหลาย Property
+  properties    Property[]
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+// =============================================================================
+// 🏠 Property — อสังหาริมทรัพย์แต่ละรายการ
+// =============================================================================
+model Property {
+  id          String       @id @default(cuid())
+  name        String
+  type        String       // 'House' | 'Villa' | 'Apartment' | 'Condo'
+  location    String       // เช่น 'Beverly Hills, CA'
+  city        String
+  state       String
+  address     String
+  price       Float
+  priceType   String       // 'month' | 'year'
+  rating      Float        @default(0)
+  reviewCount Int          @default(0)
+  bedrooms    Int
+  bathrooms   Int
+  area        Float
+  landArea    Float        @default(0)
+  amenities   String       // เก็บเป็น JSON string เช่น '["Pool","Gym"]'
+  description String
+  featured    Boolean      @default(false)
+  available   Boolean      @default(true)
+  yearBuilt   Int
+  parking     Int          @default(0)
+  latitude    Float        @default(0)
+  longitude   Float        @default(0)
+
+  // relation: Property มีหลาย Image
+  images      Image[]
+
+  // relation: Property มี Agent คนเดียว
+  agentId     String
+  agent       Agent        @relation(fields: [agentId], references: [id])
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+// =============================================================================
+// 🖼️ Image — รูปภาพของ Property (เก็บ URL จาก Cloudinary)
+// =============================================================================
+model Image {
+  id         String   @id @default(cuid())
+  url        String   // Cloudinary URL
+  publicId   String   // Cloudinary public_id (ใช้ตอนลบรูป)
+  order      Int      @default(0)  // ลำดับการแสดงรูป
+
+  // relation: Image อยู่ใน Property
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+}

@@ -1,86 +1,25 @@
-// =============================================================================
-// 📁 app/contact/page.tsx — Contact Page (Server Component)
-// =============================================================================
-//
-// 🔑 Server Component — ไม่มี 'use client':
-// ─────────────────────────────────────────────
-// ไฟล์นี้เป็น Server Component เพราะ:
-//   1. ไม่มี useState, useEffect, useRouter หรือ hooks ใดๆ
-//   2. ไม่มี event handlers (onClick, onChange) โดยตรง
-//   3. ส่วนที่ต้องมี interactivity (ContactForm) แยกเป็น Client Component ต่างหาก
-//
-// 🔑 ข้อดีของ Server Component:
-//   - HTML ถูก render บน server → ส่งให้ browser พร้อมใช้
-//   - ไม่ส่ง JavaScript ไปฝั่ง client (ยกเว้น Client Components ที่ใช้)
-//   - SEO ดีเพราะ content อยู่ใน HTML ตั้งแต่แรก
-//   - import data ตรงจาก lib ได้ ไม่ต้อง fetch API
-//
-// 🔑 เทียบกับ React JS:
-//   React JS:
-//     - ทุก component เป็น Client Component
-//     - ต้อง fetch data จาก API: useEffect(() => { fetch('/api/agents') }, [])
-//     - ต้องมี loading state: if (loading) return <Spinner />
-//     - Content render ฝั่ง client → SEO ไม่ดี (ถ้าไม่มี SSR)
-//
-//   Next.js (Server Component):
-//     - import { agents } from '@/lib/mock-data' → ใช้ได้เลย
-//     - ไม่ต้อง fetch, ไม่ต้อง loading state, ไม่ต้อง useEffect
-//     - HTML พร้อม content ส่งให้ browser ทันที
-//
-// 🔑 Pattern: Server Component + Client Component ทำงานร่วมกัน:
-//   - ไฟล์นี้ (Server) จัดการ layout, static content, SEO metadata
-//   - ContactForm (Client) จัดการ form interaction (useState, useForm)
-//   - agents data ถูก import ตรง ไม่ต้องส่งผ่าน API
-// =============================================================================
-
-// =============================================================================
-// 📦 Imports
-// =============================================================================
-
 import type { Metadata } from 'next';
-// Metadata = type สำหรับ SEO metadata ของ Next.js
-// 🔑 React JS: ใช้ react-helmet: <Helmet><title>Contact</title></Helmet>
-// 🔑 Next.js: export const metadata: Metadata = { title: '...' }
 
 import Image from 'next/image';
-// Image = Next.js component สำหรับ optimize รูปภาพ (lazy load, responsive, WebP)
-// 🔑 React JS: ใช้ <img> ธรรมดา — ไม่มี optimization ในตัว
 
 import Link from 'next/link';
-// Link = client-side navigation ไม่ reload หน้า
-// 🔑 React JS: <Link to="..."> จาก react-router-dom
-// 🔑 Next.js: <Link href="..."> — ใช้ href ไม่ใช่ to
 
-import ContactForm from '@/components/ContactForm';
-// ContactForm = Client Component (มี 'use client') — จัดการ form state
-// 🔑 Server Component สามารถ render Client Component ได้
-//   → Next.js จะส่งเฉพาะ JS ของ ContactForm ไปฝั่ง client
-//   → ส่วนที่เหลือของหน้านี้ไม่ส่ง JS ไปเลย
 
-import { agents } from '@/lib/mock-data';
+import { prisma } from '@/lib/prisma';
 // agents = array ข้อมูล agent ทั้ง 3 คน
-// 🔑 นี่คือความแตกต่างสำคัญกับ React JS:
-//   React JS: ต้อง fetch จาก API ใน useEffect
 //     const [agents, setAgents] = useState([]);
 //     useEffect(() => {
 //       fetch('/api/agents').then(res => res.json()).then(setAgents);
 //     }, []);
 //
-//   Next.js (Server Component): import ตรงได้เลย!
 //     import { agents } from '@/lib/mock-data';
 //     → ไม่ต้อง fetch, ไม่ต้อง useState, ไม่ต้อง useEffect
 //     → data พร้อมใช้ตั้งแต่ server render
 
-// =============================================================================
-// 🏷️ Static Metadata — SEO สำหรับหน้า Contact
-// =============================================================================
-// 🔑 export const metadata (static) vs generateMetadata() (dynamic):
 //   - Static metadata: ใช้เมื่อ metadata ไม่เปลี่ยนตาม params (เช่น หน้า Contact)
 //   - Dynamic metadata: ใช้เมื่อ metadata ขึ้นอยู่กับ params (เช่น หน้า /listings/[id])
 //
-// 🔑 React JS: <Helmet><title>Contact Us</title></Helmet>
 //   → render ฝั่ง client → bot อาจอ่านไม่ทัน
-// 🔑 Next.js: export const metadata → render ฝั่ง server → bot อ่านได้ทันที
 export const metadata: Metadata = {
   title: 'Contact Us — Meet Our Expert Agents',
   // title กลายเป็น <title> ใน HTML <head>
@@ -91,16 +30,14 @@ export const metadata: Metadata = {
 
   // openGraph = metadata สำหรับ social media (Facebook, LINE, Twitter)
   openGraph: {
-    title: 'Contact AumEstate Studio',
+    title: 'Contact Home Reality',
     description:
       'Connect with our expert agents. We help you find, buy, rent or sell properties across California.',
     url: 'https://www.aumestatestudio.com/contact',
   },
 };
 
-// =============================================================================
 // 📍 OFFICE_INFO — ข้อมูลสำนักงาน (constant ใช้ใน JSX)
-// =============================================================================
 // แยกออกมาเป็น constant เพื่อ:
 //   1. ไม่ทำให้ JSX รก
 //   2. แก้ไขข้อมูลได้ง่ายที่เดียว
@@ -114,7 +51,7 @@ const OFFICE_INFO = [
       </svg>
     ),
     label: 'Office Address',
-    value: '9876 Wilshire Blvd, Suite 400\nBeverly Hills, CA 90210',
+    value: '99/1 ถนนสุขุมวิท แขวงคลองเตย\nกรุงเทพมหานคร 10110',
     // \n จะถูก render เป็นบรรทัดใหม่ด้วย whitespace-pre-line
   },
   {
@@ -124,7 +61,7 @@ const OFFICE_INFO = [
       </svg>
     ),
     label: 'Phone',
-    value: '+1 (800) 286-3782',
+    value: '+66 2 123 4567',
   },
   {
     icon: (
@@ -133,7 +70,7 @@ const OFFICE_INFO = [
       </svg>
     ),
     label: 'Email',
-    value: 'hello@aumestatestudio.com',
+    value: 'hello@realestatethailand.com',
   },
   {
     icon: (
@@ -146,19 +83,10 @@ const OFFICE_INFO = [
   },
 ];
 
-// =============================================================================
-// 🏗️ ContactPage — Page Component หลัก (Server Component)
-// =============================================================================
-// 🔑 สังเกต: ไม่มี 'use client' → นี่คือ Server Component
-// 🔑 สังเกต: ไม่ใช่ async function → ไม่ต้อง await อะไร (ไม่มี dynamic params)
-// 🔑 สังเกต: ไม่รับ props → หน้านี้ไม่มี dynamic segment ([id])
 //
-// 🔑 เทียบกับ React JS:
-//   React JS: function ContactPage() { ... }  ← เหมือนกัน!
-//   แต่ใน React JS มันเป็น Client Component อัตโนมัติ
 //   ใน Next.js มันเป็น Server Component อัตโนมัติ (ไม่ส่ง JS ไป client)
-// =============================================================================
-export default function ContactPage() {
+export default async function ContactPage() {
+  const agents = await prisma.agent.findMany({ orderBy: { name: 'asc' } });
   return (
     <>
       {/* ================================================================= */}
@@ -207,24 +135,79 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Grid: 2/3 สำหรับ form, 1/3 สำหรับ office info */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {/* ─── Contact Form (2/3 ของ grid) ─────────────────────────── */}
+            {/* ─── LINE Contact (2/3 ของ grid) ─────────────────────────── */}
             <div className="lg:col-span-2">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">Send Us a Message</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">ติดต่อเราผ่าน LINE</h2>
                 <p className="text-gray-500 text-sm">
-                  Fill out the form and we&apos;ll connect you with the best agent for your needs.
+                  สแกน QR Code หรือกดปุ่มด้านล่างเพื่อเพิ่มเพื่อนและส่งข้อความหา agent โดยตรง
                 </p>
               </div>
-              {/* ──────────────────────────────────────────────────────── */}
-              {/* 🔑 ContactForm = Client Component (มี 'use client')    */}
-              {/* ──────────────────────────────────────────────────────── */}
-              {/* Server Component (ไฟล์นี้) render Client Component ได้  */}
-              {/* Next.js จะส่งเฉพาะ JS ของ ContactForm ไปฝั่ง client     */}
-              {/* ส่วนที่เหลือของหน้าไม่ส่ง JS ไป → performance ดี       */}
-              {/*                                                         */}
-              {/* 🔑 React JS: ทุกอย่างเป็น client → ส่ง JS ทั้งหน้า     */}
-              {/* 🔑 Next.js: ส่ง JS เฉพาะ component ที่ต้องการ           */}
-              <ContactForm />
+
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+                <div className="flex flex-col sm:flex-row items-center gap-8">
+
+                  {/* QR Code */}
+                  <div className="shrink-0 flex flex-col items-center gap-3">
+                    <div className="p-3 bg-white rounded-2xl border-2 border-[#06C755] shadow-md">
+                      <Image
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://line.me/ti/p/~homereality&color=06C755&bgcolor=ffffff&margin=4"
+                        alt="LINE QR Code — Home Reality"
+                        width={180}
+                        height={180}
+                        className="rounded-lg"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400">สแกนด้วยกล้องมือถือหรือ LINE app</p>
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex flex-col items-center sm:items-start gap-5 text-center sm:text-left">
+                    {/* LINE logo + ID */}
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#06C755' }}>
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="white">
+                          <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium">LINE ID</p>
+                        <p className="text-xl font-bold text-gray-900 tracking-wide">@HomeReality</p>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
+                      เพิ่มเพื่อนแล้วส่งข้อความมาได้เลยค่ะ agent ของเราพร้อมตอบทุกวัน
+                      <br />
+                      <span className="font-medium text-gray-700">จันทร์–ศุกร์ 9:00–19:00 · เสาร์–อาทิตย์ 10:00–17:00</span>
+                    </p>
+
+                    {/* ปุ่ม Add Friend */}
+                    <a
+                      href="https://line.me/ti/p/~homereality"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90"
+                      style={{ background: '#06C755' }}
+                    >
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
+                        <path d="M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+                      </svg>
+                      เพิ่มเพื่อนใน LINE
+                    </a>
+                  </div>
+                </div>
+
+                {/* Divider + note */}
+                <div className="mt-8 pt-6 border-t border-gray-100 flex items-start gap-2">
+                  <svg className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-xs text-gray-400">
+                    กรณีต้องการให้ agent ติดต่อกลับ กรุณาระบุชื่อ เบอร์โทร และ property ที่สนใจในข้อความค่ะ
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* ─── Office Info Sidebar (1/3 ของ grid) ──────────────────── */}
@@ -255,7 +238,7 @@ export default function ContactPage() {
               <div
                 className="relative h-48 rounded-xl overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 flex items-center justify-center"
                 role="img"
-                aria-label="Map showing office location in Beverly Hills"
+                aria-label="Map showing office location in Bangkok"
               >
                 {/* Grid lines decorative */}
                 <div
@@ -274,8 +257,8 @@ export default function ContactPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     </svg>
                   </div>
-                  <p className="text-xs font-semibold text-gray-700">AumEstate Studio</p>
-                  <p className="text-xs text-gray-500">Beverly Hills, CA</p>
+                  <p className="text-xs font-semibold text-gray-700">Home Reality</p>
+                  <p className="text-xs text-gray-500">Bangkok, Thailand</p>
                 </div>
               </div>
             </aside>
@@ -329,23 +312,25 @@ export default function ContactPage() {
                 <div className="px-6 pb-6">
                   {/* Avatar — -mt-12 ดึงขึ้นมาทับ gradient ข้างบน */}
                   <div className="relative -mt-12 mb-4">
-                    <div className="w-20 h-20 rounded-2xl overflow-hidden border-4 border-white shadow-md bg-gray-100">
-                      {/* 🔑 Next.js Image: optimize รูปอัตโนมัติ */}
-                      {/* 🔑 React JS: ใช้ <img> ธรรมดา ไม่มี optimization */}
-                      <Image
-                        src={agent.avatar}
-                        alt={agent.name}
-                        width={80}
-                        height={80}
-                        className="object-cover w-full h-full"
-                      />
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden border-4 border-white shadow-md bg-gray-100 flex items-center justify-center">
+                      {agent.avatar ? (
+                        <Image
+                          src={agent.avatar}
+                          alt={agent.name}
+                          width={80}
+                          height={80}
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <span className="text-2xl font-bold text-gray-400">{agent.name[0]}</span>
+                      )}
                     </div>
                   </div>
 
                   {/* Agent Info */}
                   <h3 className="text-lg font-bold text-gray-900 mb-0.5">{agent.name}</h3>
                   <p className="text-sm text-blue-600 font-medium mb-3">
-                    Licensed Real Estate Agent
+                    Licensed Home Reality Agent
                   </p>
 
                   {/* Stats Row: Rating | Listings | Experience */}
@@ -435,7 +420,7 @@ export default function ContactPage() {
               },
               {
                 q: 'Are all listings verified?',
-                a: 'Yes. Every property listed on AumEstate Studio is manually reviewed by our team to ensure accuracy of information, pricing, and availability.',
+                a: 'Yes. Every property listed on Home Reality is manually reviewed by our team to ensure accuracy of information, pricing, and availability.',
               },
               {
                 q: 'Do you charge fees for using the platform?',

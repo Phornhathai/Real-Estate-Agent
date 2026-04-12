@@ -1,38 +1,10 @@
-// =============================================================================
-// 📁 components/ContactForm.tsx — Contact Form ใช้ React Hook Form
-// =============================================================================
-//
-// 🔑 React Hook Form vs useState (แบบเดิม):
-// ─────────────────────────────────────────────
-// useState (แบบเดิม):
-//   - ต้องสร้าง state เอง: useState({ name: '', email: '', ... })
-//   - ต้องเขียน handleChange เอง: (e) => setFormData(...)
-//   - ต้อง validate เอง: if (!email) setError(...)
-//   - Re-render ทั้ง form ทุกครั้งที่พิมพ์ตัวอักษร
-//
-// React Hook Form:
-//   - ใช้ register() ผูก input อัตโนมัติ — ไม่ต้อง onChange
-//   - Validate ในตัว — แค่ใส่ { required: true, pattern: /.../ }
-//   - Re-render เฉพาะ field ที่เปลี่ยน — performance ดีกว่า
-//   - errors object บอกทุก field ที่ผิด — แสดง error message ง่าย
-//
-// 🔑 ความแตกต่างกับ React JS ปกติ:
-//   - ใน Next.js ต้องมี 'use client' เพราะ React Hook Form ใช้ state/ref
-//   - React JS ปกติไม่ต้องใส่ 'use client' เพราะทุกอย่างเป็น client อยู่แล้ว
-// =============================================================================
-
 'use client';
-// 🔑 Next.js: ต้องใส่ 'use client' เพราะ component นี้ใช้ hooks (useForm)
-// React JS: ไม่ต้องใส่บรรทัดนี้ เพราะทุก component เป็น client อยู่แล้ว
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 // useForm = hook หลักของ React Hook Form
 // ให้เราจัดการ form ทั้งหมด: register, validate, submit, errors
 
-// -----------------------------------------------------------------------------
-// 📝 Type สำหรับข้อมูล form — TypeScript บังคับให้ทุก field มี type ชัดเจน
-// -----------------------------------------------------------------------------
 interface ContactFormData {
   name: string;       // ชื่อผู้ติดต่อ
   email: string;      // อีเมล (required)
@@ -41,9 +13,6 @@ interface ContactFormData {
   message: string;    // ข้อความ (required)
 }
 
-// -----------------------------------------------------------------------------
-// 📋 ตัวเลือก Subject dropdown
-// -----------------------------------------------------------------------------
 const SUBJECTS = [
   { value: '', label: 'Select a subject...' },
   { value: 'buy', label: "I want to buy a property" },
@@ -53,32 +22,21 @@ const SUBJECTS = [
   { value: 'other', label: "Other inquiry" },
 ];
 
-// -----------------------------------------------------------------------------
-// 🎨 CSS class ที่ใช้ซ้ำ — แยกออกมาเพื่อไม่ต้องเขียนซ้ำทุก input
-// -----------------------------------------------------------------------------
 const inputClass =
   'w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition';
 const errorInputClass =
   'w-full px-4 py-2.5 text-sm bg-red-50 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition';
 
-// =============================================================================
-// 🏗️ Component หลัก
-// =============================================================================
 export default function ContactForm() {
-  // ---------------------------------------------------------------------------
-  // 🎯 useForm — hook หลักที่ทำทุกอย่างให้
-  // ---------------------------------------------------------------------------
   // register   = ผูก input กับ form (แทน value + onChange)
   // handleSubmit = wrap function submit พร้อม validate อัตโนมัติ
   // formState  = { errors, isSubmitting } สถานะของ form
   // reset      = ล้าง form กลับค่าเริ่มต้น
   //
-  // 🔑 เทียบกับ useState แบบเดิม:
   //   แบบเดิม: const [formData, setFormData] = useState({...})
   //            const [loading, setLoading] = useState(false)
   //   RHF:     const { register, handleSubmit, ... } = useForm()
   //            → ไม่ต้องสร้าง state เอง, ไม่ต้อง handleChange
-  // ---------------------------------------------------------------------------
   const {
     register,        // ฟังก์ชันผูก input: {...register('fieldName', { rules })}
     handleSubmit,    // ฟังก์ชัน wrap onSubmit: handleSubmit(mySubmitFn)
@@ -89,7 +47,6 @@ export default function ContactForm() {
     reset,           // ฟังก์ชันล้าง form ทั้งหมด
   } = useForm<ContactFormData>({
     // defaultValues = ค่าเริ่มต้นของทุก field
-    // 🔑 เทียบ useState: useState({ name: '', email: '', ... })
     defaultValues: {
       name: '',
       email: '',
@@ -99,20 +56,13 @@ export default function ContactForm() {
     },
   });
 
-  // ---------------------------------------------------------------------------
   // 📬 State สำหรับแสดงหน้า "ส่งสำเร็จ"
   // (ยังใช้ useState ปกติ เพราะไม่ใช่ form field)
-  // ---------------------------------------------------------------------------
   const [submitted, setSubmitted] = useState(false);
 
-  // ---------------------------------------------------------------------------
-  // 📤 ฟังก์ชัน Submit — ถูกเรียกหลัง validate ผ่านทุก field แล้วเท่านั้น
-  // ---------------------------------------------------------------------------
-  // 🔑 เทียบกับแบบเดิม:
   //   แบบเดิม: const handleSubmit = (e) => { e.preventDefault(); validate(); ... }
   //   RHF:     const onSubmit = (data) => { /* data ถูก validate แล้ว */ }
   //            → ไม่ต้อง e.preventDefault() เอง, ไม่ต้อง validate เอง
-  // ---------------------------------------------------------------------------
   const onSubmit = async (data: ContactFormData) => {
     // data = ข้อมูล form ที่ผ่าน validation แล้ว (type-safe)
     console.log('Form submitted:', data);
@@ -121,12 +71,8 @@ export default function ContactForm() {
     await new Promise((r) => setTimeout(r, 1200));
 
     setSubmitted(true);
-    // 🔑 ไม่ต้อง setLoading(false) เพราะ isSubmitting จัดการให้อัตโนมัติ
   };
 
-  // ---------------------------------------------------------------------------
-  // ✅ หน้า Success — แสดงหลังส่งสำเร็จ
-  // ---------------------------------------------------------------------------
   if (submitted) {
     return (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
@@ -159,12 +105,8 @@ export default function ContactForm() {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // 📝 Form UI
-  // ---------------------------------------------------------------------------
   return (
     <form
-      // 🔑 RHF: handleSubmit(onSubmit) จะ validate ก่อน แล้วค่อยเรียก onSubmit
       //   แบบเดิม: onSubmit={handleSubmit} ← ต้อง e.preventDefault() + validate เอง
       onSubmit={handleSubmit(onSubmit)}
       className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 lg:p-8 space-y-5"
@@ -184,20 +126,15 @@ export default function ContactForm() {
             placeholder="John Smith"
             autoComplete="name"
             className={errors.name ? errorInputClass : inputClass}
-            // ─────────────────────────────────────────────────────────────────
-            // 🔑 register('name', { rules }) — หัวใจของ React Hook Form
-            // ─────────────────────────────────────────────────────────────────
             // ...register() จะ spread props เหล่านี้ให้อัตโนมัติ:
             //   - name="name"
             //   - ref={...}      ← RHF ใช้ ref แทน state (ไม่ re-render ทุกตัวอักษร)
             //   - onChange={...} ← จัดการให้อัตโนมัติ
             //   - onBlur={...}   ← validate ตอน blur (ถ้าตั้ง mode)
             //
-            // 🔑 เทียบกับแบบเดิม:
             //   แบบเดิม: name="name" value={formData.name} onChange={handleChange}
             //   RHF:     {...register('name', { required: '...' })}
             //            → สั้นกว่า, validate ในตัว, ไม่ re-render ทั้ง form
-            // ─────────────────────────────────────────────────────────────────
             {...register('name', {
               required: 'Please enter your name',  // ข้อความ error ถ้าว่าง
               minLength: {
@@ -228,7 +165,6 @@ export default function ContactForm() {
             {...register('email', {
               required: 'Please enter your email',
               // pattern = regex validation — ตรวจรูปแบบ email
-              // 🔑 แบบเดิม: ต้องเขียน if (!/regex/.test(email)) setError(...)
               // RHF: ใส่ pattern ใน register ได้เลย
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -280,7 +216,6 @@ export default function ContactForm() {
           <select
             id="contact-subject"
             className={errors.subject ? errorInputClass : inputClass}
-            // 🔑 register ใช้กับ <select> ได้เหมือน <input> เลย
             {...register('subject', {
               required: 'Please select a subject',
             })}
@@ -309,7 +244,6 @@ export default function ContactForm() {
           rows={5}
           placeholder="Tell us about your property needs, preferred locations, budget, timeline..."
           className={`${errors.message ? errorInputClass : inputClass} resize-none`}
-          // 🔑 register ใช้กับ <textarea> ได้เหมือนกัน
           {...register('message', {
             required: 'Please enter your message',
             minLength: {
@@ -337,7 +271,6 @@ export default function ContactForm() {
       {/* =================================================================== */}
       <button
         type="submit"
-        // 🔑 isSubmitting = true ขณะ onSubmit กำลังทำงาน (async)
         //   แบบเดิม: disabled={loading} ← ต้อง setLoading(true/false) เอง
         //   RHF:     disabled={isSubmitting} ← อัตโนมัติ
         disabled={isSubmitting}

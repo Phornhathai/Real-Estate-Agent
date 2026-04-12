@@ -1,48 +1,29 @@
-// =============================================================================
-// 📁 lib/mock-data.ts — ข้อมูลจำลอง (Mock Data) แทน Database + API
-// =============================================================================
 //
-// 🔑 ทำไมใช้ Mock Data แทน API?
-// ─────────────────────────────────
 // โปรเจกต์นี้ไม่มี backend (database, API server) — ข้อมูลทั้งหมดอยู่ในไฟล์นี้
 // Server Components import ข้อมูลโดยตรง ไม่ต้อง fetch
 //
-// 🔑 React JS vs Next.js — วิธีดึงข้อมูลต่างกัน:
-// ─────────────────────────────────────────────────
-// React JS (Client-side):
 //   - ข้อมูลอยู่ที่ backend (Express, Django, etc.)
 //   - ต้อง fetch จาก API: useEffect(() => { fetch('/api/properties') }, [])
 //   - ต้องจัดการ loading state, error state
 //   - ข้อมูลถูกส่งเป็น JSON ผ่าน network → ช้ากว่า
 //
-// Next.js (Server Components):
 //   - import { properties } from '@/lib/mock-data' ← อ่านโดยตรงใน Server Component
 //   - ไม่ต้อง fetch, ไม่ต้อง useEffect, ไม่ต้อง loading state
 //   - ข้อมูลพร้อมใช้ตอน render — เร็วกว่า, SEO ดีกว่า (HTML มีข้อมูลครบตั้งแต่แรก)
 //   - ถ้ามี backend จริง: ก็แค่ await fetch() ใน Server Component ได้เลย (ไม่ต้อง useEffect)
 //
-// 🔑 ใครใช้ไฟล์นี้บ้าง?
 //   - app/page.tsx          → getFeaturedProperties()  (หน้าแรก แสดง 4 properties)
 //   - app/listings/[id]/page.tsx → getPropertyById(id) (หน้า detail)
 //   - app/contact/page.tsx  → agents[]                 (แสดงรายชื่อ agents)
 //   - components/ListingsClient.tsx → properties[]      (หน้า listings ทั้งหมด)
-// =============================================================================
 
-// =============================================================================
-// 📝 TypeScript Type — PropertyType
-// =============================================================================
 // Union Type: กำหนดว่า type ของ property ได้แค่ 4 ค่าเท่านั้น
 // ถ้าใส่ค่าอื่น เช่น 'Bungalow' → TypeScript จะ error ตอน compile
-// 🔑 React JS ก็ใช้ TypeScript ได้เหมือนกัน — ไม่ใช่เรื่องเฉพาะ Next.js
 export type PropertyType = 'House' | 'Villa' | 'Apartment' | 'Condo';
 
-// =============================================================================
-// 📝 TypeScript Interface — Agent (ข้อมูลตัวแทนอสังหาริมทรัพย์)
-// =============================================================================
 // Interface = กำหนดรูปร่าง (shape) ของ object
 // ทุก Agent object ต้องมี field ครบตามนี้ ไม่งั้น TypeScript จะ error
 //
-// 🔑 ทำไมต้องใช้ Interface?
 //   - Type safety: ป้องกันพิมพ์ผิด เช่น agent.nmae แทน agent.name → error ทันที
 //   - Autocomplete: VS Code แนะนำ field ได้ เช่น พิมพ์ agent. แล้วเห็น .name, .email
 //   - Documentation: อ่าน interface แล้วรู้ทันทีว่า Agent มี field อะไรบ้าง
@@ -58,13 +39,9 @@ export interface Agent {
   bio: string;           // ประวัติย่อ
 }
 
-// =============================================================================
-// 📝 TypeScript Interface — Property (ข้อมูลอสังหาริมทรัพย์)
-// =============================================================================
 // Interface หลักของโปรเจกต์ — ข้อมูลบ้าน/คอนโด/วิลล่าแต่ละหลัง
 // ใช้ทั่วทั้งโปรเจกต์: PropertyCard, ListingsClient, FilterSidebar, Detail page
 //
-// 🔑 สังเกต: agent field เป็น type Agent (ไม่ใช่ string)
 //   แปลว่าทุก Property มี Agent object ฝังอยู่ข้างใน (nested object)
 //   ในโปรเจกต์จริงอาจเป็น agentId: string แล้ว join กับ agents table
 export interface Property {
@@ -94,10 +71,7 @@ export interface Property {
   coordinates: { lat: number; lng: number };  // พิกัด GPS — ใช้แสดงแผนที่ (ถ้ามี)
 }
 
-// =============================================================================
 // 👥 ข้อมูลตัวแทน (Agents) — 3 คน
-// =============================================================================
-// 🔑 export const = export ออกไปให้ไฟล์อื่น import ได้
 //   ใช้ใน: app/contact/page.tsx (แสดงรายชื่อ agents)
 //   Agent[] = array ของ Agent objects (TypeScript ตรวจให้ว่าทุก object ตรงตาม interface)
 export const agents: Agent[] = [
@@ -139,33 +113,22 @@ export const agents: Agent[] = [
   },
 ];
 
-// =============================================================================
-// 🏠 ข้อมูล Properties — 12 รายการ
-// =============================================================================
-// 🔑 นี่คือ "database" ของโปรเจกต์ — ข้อมูลทั้งหมดอยู่ที่นี่
 //
-// 🔑 React JS vs Next.js — วิธีเข้าถึงข้อมูลต่างกัน:
-//   React JS:  fetch('/api/properties') ใน useEffect → ต้องรอ loading
-//   Next.js:   import { properties } from '@/lib/mock-data' → พร้อมใช้ทันที
 //
-// 🔑 สังเกต: agent field ใช้ agents[0], agents[1], agents[2]
 //   = อ้างอิง object จาก array agents ด้านบน (ไม่ได้ copy ข้อมูลซ้ำ)
 //   ในโปรเจกต์จริง database จะใช้ foreign key (agentId) แทน
 //
 // Property[] = TypeScript ตรวจให้ว่าทุก object ใน array ตรงตาม Property interface
 export const properties: Property[] = [
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 1 — Sunridge Modern Villa (featured: true)
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-1',
-    name: 'Sunridge Modern Villa',
+    name: 'Sukhumvit Modern Villa',
     type: 'Villa',
-    location: 'Beverly Hills, CA',
-    city: 'Beverly Hills',
-    state: 'CA',
-    address: '1234 Sunset Blvd, Beverly Hills, CA 90210',
-    price: 8500,
+    location: 'สุขุมวิท, กรุงเทพฯ',
+    city: 'กรุงเทพมหานคร',
+    state: 'กทม',
+    address: '123 ซอยสุขุมวิท 31 แขวงคลองเตยเหนือ เขตวัฒนา กรุงเทพฯ 10110',
+    price: 120000,
     priceType: 'month',
     rating: 4.9,
     reviewCount: 47,
@@ -181,26 +144,23 @@ export const properties: Property[] = [
       'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'An exquisite modern villa nestled in the prestigious hills of Beverly Hills. This architectural masterpiece features floor-to-ceiling windows, an infinity pool overlooking the canyon, gourmet kitchen with top-of-the-line appliances, and a cinema room. The landscaped grounds include a meditation garden and outdoor entertainment area perfect for California living.',
-    agent: agents[0],    // Sarah Johnson
-    featured: true,      // ✅ แสดงในหน้าแรก
+      'วิลล่าสมัยใหม่สุดหรูใจกลางย่านสุขุมวิท ออกแบบโดยสถาปนิกรางวัลระดับชาติ ตกแต่งด้วยวัสดุนำเข้าคุณภาพสูง พร้อมสระว่ายน้ำอินฟินิตี้ ห้องออกกำลังกายส่วนตัว และระบบสมาร์ทโฮมครบครัน ทำเลใกล้ BTS สถานีพร้อมพงษ์ เดินทางสะดวกทุกทิศทาง',
+    agent: agents[0],
+    featured: true,
     available: true,
     yearBuilt: 2019,
     parking: 3,
-    coordinates: { lat: 34.0736, lng: -118.4004 },
+    coordinates: { lat: 13.7278, lng: 100.5694 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 2 — Oakwood Family Home (featured: true)
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-2',
-    name: 'Oakwood Family Home',
+    name: 'Nimman Family Home',
     type: 'House',
-    location: 'Pasadena, CA',
-    city: 'Pasadena',
-    state: 'CA',
-    address: '567 Oak Avenue, Pasadena, CA 91101',
-    price: 4200,
+    location: 'นิมมานเหมินทร์, เชียงใหม่',
+    city: 'เชียงใหม่',
+    state: 'เชียงใหม่',
+    address: '88 ถนนนิมมานเหมินทร์ ตำบลสุเทพ อำเภอเมือง เชียงใหม่ 50200',
+    price: 45000,
     priceType: 'month',
     rating: 4.7,
     reviewCount: 31,
@@ -208,33 +168,30 @@ export const properties: Property[] = [
     bathrooms: 3,
     area: 2800,
     landArea: 5500,
-    amenities: ['Garden', 'Garage', 'Fireplace', 'Patio', 'Storage'],
+    amenities: ['Garden', 'Garage', 'Patio', 'Storage', 'Smart Home'],
     images: [
       'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'A charming craftsman-style family home in the heart of Pasadena. Surrounded by mature oak trees, this property offers a warm and welcoming atmosphere with original hardwood floors, a renovated kitchen, and a spacious backyard ideal for entertaining. Located in a top-rated school district.',
-    agent: agents[2],    // Emily Rodriguez
-    featured: true,      // ✅ แสดงในหน้าแรก
+      'บ้านเดี่ยวสไตล์ล้านนาร่วมสมัยในย่านนิมมานเหมินทร์ที่มีชีวิตชีวา ล้อมรอบด้วยต้นไม้ร่มรื่น พื้นไม้สักแท้ ครัวใหม่พร้อมอุปกรณ์ครบครัน และสวนหลังบ้านขนาดใหญ่เหมาะสำหรับครอบครัว ใกล้ Maya Mall และมหาวิทยาลัยเชียงใหม่',
+    agent: agents[2],
+    featured: true,
     available: true,
-    yearBuilt: 1965,
+    yearBuilt: 2010,
     parking: 2,
-    coordinates: { lat: 34.1478, lng: -118.1445 },
+    coordinates: { lat: 18.8034, lng: 98.9673 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 3 — Downtown Luxury Loft (featured: true)
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-3',
-    name: 'Downtown Luxury Loft',
+    name: 'Silom Luxury Apartment',
     type: 'Apartment',
-    location: 'Los Angeles, CA',
-    city: 'Los Angeles',
-    state: 'CA',
-    address: '888 Grand Ave, Unit 1204, Los Angeles, CA 90015',
-    price: 3800,
+    location: 'สีลม, กรุงเทพฯ',
+    city: 'กรุงเทพมหานคร',
+    state: 'กทม',
+    address: '999 ถนนสีลม แขวงสีลม เขตบางรัก กรุงเทพฯ 10500',
+    price: 65000,
     priceType: 'month',
     rating: 4.6,
     reviewCount: 23,
@@ -249,26 +206,23 @@ export const properties: Property[] = [
       'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'An ultra-modern loft on the 12th floor of the iconic Grand Tower. Featuring polished concrete floors, exposed brick, and panoramic city views. The open-plan living area is flooded with natural light. Building amenities include a rooftop pool, co-working lounge, and 24/7 concierge.',
-    agent: agents[1],    // Michael Chen
-    featured: true,      // ✅ แสดงในหน้าแรก
+      'อพาร์ตเมนต์หรูชั้น 18 ในย่านธุรกิจสีลม วิวเมืองแบบพาโนราม่า ตกแต่งด้วยวัสดุพรีเมียม พื้นลอฟต์คอนกรีตขัดมัน ทางเข้าส่วนตัว พร้อมสระว่ายน้ำบนดาดฟ้าและห้องทำงาน co-working ใกล้ BTS ช่องนนทรี',
+    agent: agents[1],
+    featured: true,
     available: true,
     yearBuilt: 2018,
     parking: 1,
-    coordinates: { lat: 34.0522, lng: -118.2437 },
+    coordinates: { lat: 13.7234, lng: 100.5235 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 4 — Marina Bay Condo (featured: true)
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-4',
-    name: 'Marina Bay Condo',
+    name: 'Thonglor Sky Condo',
     type: 'Condo',
-    location: 'Santa Monica, CA',
-    city: 'Santa Monica',
-    state: 'CA',
-    address: '200 Ocean Ave, Unit 5B, Santa Monica, CA 90402',
-    price: 5200,
+    location: 'ทองหล่อ, กรุงเทพฯ',
+    city: 'กรุงเทพมหานคร',
+    state: 'กทม',
+    address: '55 ซอยทองหล่อ 13 แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพฯ 10110',
+    price: 85000,
     priceType: 'month',
     rating: 4.8,
     reviewCount: 38,
@@ -276,33 +230,30 @@ export const properties: Property[] = [
     bathrooms: 2,
     area: 1900,
     landArea: 0,
-    amenities: ['Pool', 'Gym', 'Parking', 'Balcony', 'Security', 'Beach Access'],
+    amenities: ['Pool', 'Gym', 'Parking', 'Balcony', 'Security', 'Rooftop'],
     images: [
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'A stunning oceanfront condo steps from the Santa Monica Pier. Enjoy spectacular sunset views from your private balcony. Recently renovated with high-end finishes, a chef\'s kitchen with quartz countertops, and spa-like bathrooms. Building features direct beach access and resort-style amenities.',
-    agent: agents[0],    // Sarah Johnson
-    featured: true,      // ✅ แสดงในหน้าแรก (รวม 4 featured properties สำหรับหน้าแรก)
+      'คอนโดหรูในย่านทองหล่อที่ทันสมัยที่สุดของกรุงเทพฯ วิวเมืองสวยงามจากระเบียงส่วนตัว ตกแต่งใหม่ด้วยวัสดุคุณภาพสูง ครัวพร้อมเคาน์เตอร์ควอตซ์ และห้องน้ำสไตล์สปา ใกล้ BTS ทองหล่อ ร้านอาหาร และ J Avenue',
+    agent: agents[0],
+    featured: true,
     available: true,
     yearBuilt: 2015,
     parking: 2,
-    coordinates: { lat: 34.0195, lng: -118.4912 },
+    coordinates: { lat: 13.7306, lng: 100.5811 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 5 — Malibu Beachfront Estate (featured: false)
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-5',
-    name: 'Malibu Beachfront Estate',
+    name: 'Phuket Beachfront Villa',
     type: 'Villa',
-    location: 'Malibu, CA',
-    city: 'Malibu',
-    state: 'CA',
-    address: '31450 Pacific Coast Hwy, Malibu, CA 90265',
-    price: 15000,
+    location: 'กะตะ, ภูเก็ต',
+    city: 'ภูเก็ต',
+    state: 'ภูเก็ต',
+    address: '15 หมู่ 4 ตำบลกะรน อำเภอเมือง ภูเก็ต 83100',
+    price: 200000,
     priceType: 'month',
     rating: 5.0,
     reviewCount: 12,
@@ -310,33 +261,30 @@ export const properties: Property[] = [
     bathrooms: 6,
     area: 6800,
     landArea: 12000,
-    amenities: ['Pool', 'Beach Access', 'Gym', 'Home Theater', 'Smart Home', 'Wine Cellar', 'Garage'],
+    amenities: ['Pool', 'Beach Access', 'Gym', 'Home Theater', 'Smart Home', 'BBQ', 'Garage'],
     images: [
       'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'An iconic Malibu estate directly on the Pacific Ocean. Every room offers breathtaking ocean panoramas. Features a private beach access gate, infinity pool that blends into the sea, outdoor kitchen, and multiple terraces. This once-in-a-lifetime property offers the ultimate in California coastal luxury.',
-    agent: agents[0],    // Sarah Johnson
+      'วิลล่าริมหาดสุดหรูในภูเก็ต ทุกห้องมองเห็นวิวทะเลอันดามันอันงดงาม พร้อมสระว่ายน้ำอินฟินิตี้ ทางลงหาดส่วนตัว ครัวกลางแจ้ง และระเบียงหลายชั้น เหมาะสำหรับผู้ที่ต้องการความเป็นส่วนตัวสูงสุดในสไตล์รีสอร์ทระดับโลก',
+    agent: agents[0],
     featured: false,
     available: true,
     yearBuilt: 2022,
     parking: 4,
-    coordinates: { lat: 34.0259, lng: -118.7798 },
+    coordinates: { lat: 7.8286, lng: 98.2956 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 6 — Sunset Strip Penthouse
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-6',
-    name: 'Sunset Strip Penthouse',
+    name: 'Asok Sky Penthouse',
     type: 'Apartment',
-    location: 'West Hollywood, CA',
-    city: 'West Hollywood',
-    state: 'CA',
-    address: '9000 Sunset Blvd, PH1, West Hollywood, CA 90069',
-    price: 9500,
+    location: 'อโศก, กรุงเทพฯ',
+    city: 'กรุงเทพมหานคร',
+    state: 'กทม',
+    address: '159 ถนนสุขุมวิท 21 แขวงคลองเตยเหนือ เขตวัฒนา กรุงเทพฯ 10110',
+    price: 150000,
     priceType: 'month',
     rating: 4.8,
     reviewCount: 19,
@@ -344,33 +292,30 @@ export const properties: Property[] = [
     bathrooms: 3,
     area: 2800,
     landArea: 0,
-    amenities: ['Rooftop Deck', 'Pool', 'Gym', 'Valet', 'Concierge', 'Smart Home'],
+    amenities: ['Rooftop Deck', 'Pool', 'Gym', 'Concierge', 'Smart Home', 'Security'],
     images: [
       'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'The crown jewel of the Sunset Strip. This spectacular penthouse offers 360-degree views from its private rooftop terrace, including the Hollywood Hills, downtown LA, and the Pacific Ocean on clear days. Designed by a celebrated architect with bespoke finishes throughout.',
-    agent: agents[1],    // Michael Chen
+      'เพนต์เฮ้าส์สุดยอดในย่านอโศก วิว 360 องศาจากดาดฟ้าส่วนตัว มองเห็นกรุงเทพฯ ยามค่ำคืนอย่างตระการตา ออกแบบโดยสถาปนิกชื่อดัง ตกแต่งด้วยวัสดุนำเข้าระดับพรีเมียม ใกล้ BTS อโศก และ MRT สุขุมวิท',
+    agent: agents[1],
     featured: false,
     available: true,
     yearBuilt: 2020,
     parking: 2,
-    coordinates: { lat: 34.0901, lng: -118.3857 },
+    coordinates: { lat: 13.7372, lng: 100.5602 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 7 — Craftsman Bungalow
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-7',
-    name: 'Craftsman Bungalow',
+    name: 'Chiang Mai Old Town House',
     type: 'House',
-    location: 'Pasadena, CA',
-    city: 'Pasadena',
-    state: 'CA',
-    address: '1122 Orange Grove Blvd, Pasadena, CA 91105',
-    price: 3500,
+    location: 'เมืองเก่า, เชียงใหม่',
+    city: 'เชียงใหม่',
+    state: 'เชียงใหม่',
+    address: '42 ถนนพระปกเกล้า ตำบลพระสิงห์ อำเภอเมือง เชียงใหม่ 50200',
+    price: 35000,
     priceType: 'month',
     rating: 4.5,
     reviewCount: 28,
@@ -378,33 +323,30 @@ export const properties: Property[] = [
     bathrooms: 2,
     area: 1850,
     landArea: 6000,
-    amenities: ['Garden', 'Porch', 'Fireplace', 'Storage', 'Parking'],
+    amenities: ['Garden', 'Parking', 'Storage', 'Patio'],
     images: [
       'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'A beautifully preserved 1920s Craftsman bungalow in Pasadena\'s historic district. Original details including built-in bookshelves, wainscoting, and coved ceilings have been lovingly maintained. The wraparound porch and manicured garden make this a true California classic.',
-    agent: agents[2],    // Emily Rodriguez
+      'บ้านทรงล้านนาดั้งเดิมในย่านเมืองเก่าเชียงใหม่ รายละเอียดงานไม้แกะสลักที่อนุรักษ์ไว้อย่างดี สวนร่มรื่น และระเบียงไม้ที่มีเสน่ห์ ทำเลใจกลางเมืองเก่า ใกล้วัดพระสิงห์ ตลาดวโรรส และถนนคนเดินเสาร์',
+    agent: agents[2],
     featured: false,
     available: true,
-    yearBuilt: 1924,
+    yearBuilt: 1980,
     parking: 1,
-    coordinates: { lat: 34.1423, lng: -118.1608 },
+    coordinates: { lat: 18.7883, lng: 98.9853 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 8 — Modern Farmhouse Estate
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-8',
-    name: 'Modern Farmhouse Estate',
+    name: 'Pattaya Pool Villa',
     type: 'House',
-    location: 'Calabasas, CA',
-    city: 'Calabasas',
-    state: 'CA',
-    address: '4500 Las Virgenes Rd, Calabasas, CA 91302',
-    price: 6800,
+    location: 'จอมเทียน, พัทยา',
+    city: 'พัทยา',
+    state: 'ชลบุรี',
+    address: '88/5 หมู่ 12 ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี 20150',
+    price: 75000,
     priceType: 'month',
     rating: 4.7,
     reviewCount: 22,
@@ -412,33 +354,30 @@ export const properties: Property[] = [
     bathrooms: 4,
     area: 4500,
     landArea: 15000,
-    amenities: ['Pool', 'Garden', 'Garage', 'Gym', 'Barn', 'Orchard'],
+    amenities: ['Pool', 'Garden', 'Garage', 'Gym', 'BBQ', 'Security'],
     images: [
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'A stunning modern farmhouse on nearly a third of an acre in gated Calabasas. This newly built estate blends contemporary design with rustic charm. The open floor plan features vaulted ceilings, white oak floors, a butler\'s pantry, and resort-style outdoor living with a pool and spa.',
-    agent: agents[1],    // Michael Chen
+      'พูลวิลล่าหรูในย่านจอมเทียน พัทยา ออกแบบสไตล์โมเดิร์นท รอปิคอล ผสมผสานความร่วมสมัยกับความงามของธรรมชาติ สระว่ายน้ำส่วนตัว สวนภูมิทัศน์สวยงาม และพื้นที่นั่งเล่นกลางแจ้ง ใกล้หาดจอมเทียนและศูนย์การค้า',
+    agent: agents[1],
     featured: false,
     available: true,
     yearBuilt: 2021,
     parking: 3,
-    coordinates: { lat: 34.1575, lng: -118.6599 },
+    coordinates: { lat: 12.9269, lng: 100.8825 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 9 — Silver Lake Loft
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-9',
-    name: 'Silver Lake Loft',
+    name: 'Ari Urban Loft',
     type: 'Apartment',
-    location: 'Los Angeles, CA',
-    city: 'Los Angeles',
-    state: 'CA',
-    address: '2720 Rowena Ave, Unit 8, Los Angeles, CA 90039',
-    price: 3200,
+    location: 'อารีย์, กรุงเทพฯ',
+    city: 'กรุงเทพมหานคร',
+    state: 'กทม',
+    address: '22 ซอยอารีย์สัมพันธ์ 4 แขวงสามเสนใน เขตพญาไท กรุงเทพฯ 10400',
+    price: 38000,
     priceType: 'month',
     rating: 4.4,
     reviewCount: 16,
@@ -446,33 +385,30 @@ export const properties: Property[] = [
     bathrooms: 1,
     area: 950,
     landArea: 0,
-    amenities: ['Rooftop', 'Bike Storage', 'Pets Allowed', 'Laundry'],
+    amenities: ['Rooftop', 'Pet Friendly', 'Parking', 'Security'],
     images: [
       'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'A chic creative loft in the vibrant Silver Lake neighborhood. Industrial-modern design with polished concrete floors, high ceilings, and massive warehouse windows. Steps from the reservoir, trendy cafes, and boutiques. The rooftop terrace offers stunning views of the Hollywood Hills.',
-    agent: agents[2],    // Emily Rodriguez
+      'ลอฟต์สไตล์สร้างสรรค์ในย่านอารีย์อันมีเอกลักษณ์ ออกแบบด้วยคอนกรีตขัดมัน เพดานสูง และหน้าต่างบานใหญ่ ใกล้คาเฟ่ ร้านอาหาร และแกลเลอรีศิลปะมากมาย ดาดฟ้าชั้นบนให้วิวเมืองสวยงาม BTS อารีย์อยู่ใกล้มาก',
+    agent: agents[2],
     featured: false,
     available: true,
     yearBuilt: 2017,
     parking: 1,
-    coordinates: { lat: 34.0879, lng: -118.2717 },
+    coordinates: { lat: 13.7774, lng: 100.5454 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 10 — Hillcrest Tudor Manor
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-10',
-    name: 'Hillcrest Tudor Manor',
+    name: 'Ratchada Classic Home',
     type: 'House',
-    location: 'Los Angeles, CA',
-    city: 'Los Angeles',
-    state: 'CA',
-    address: '6789 Hillcrest Dr, Los Angeles, CA 90068',
-    price: 5800,
+    location: 'รัชดาภิเษก, กรุงเทพฯ',
+    city: 'กรุงเทพมหานคร',
+    state: 'กทม',
+    address: '99 ซอยรัชดาภิเษก 7 แขวงดินแดง เขตดินแดง กรุงเทพฯ 10400',
+    price: 68000,
     priceType: 'month',
     rating: 4.6,
     reviewCount: 34,
@@ -480,33 +416,30 @@ export const properties: Property[] = [
     bathrooms: 3,
     area: 3200,
     landArea: 7200,
-    amenities: ['Garden', 'Garage', 'Fireplace', 'Library', 'Wine Cellar'],
+    amenities: ['Garden', 'Garage', 'Storage', 'Security'],
     images: [
       'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'A magnificent English Tudor manor perched in the Hollywood Hills. This stately home features dark-beamed ceilings, leaded glass windows, and stone fireplaces that evoke old-world grandeur. The terraced gardens offer privacy and serenity just minutes from the Sunset Strip.',
-    agent: agents[0],    // Sarah Johnson
+      'บ้านเดี่ยวสไตล์คลาสสิกในทำเลรัชดาภิเษก สวนร่มรื่นให้ความเป็นส่วนตัว ห้องนั่งเล่นกว้างขวาง ห้องครัวตกแต่งใหม่ และโรงรถ 2 คัน ทำเลใจกลางเมือง ใกล้รถไฟฟ้า MRT ห้วยขวาง และ Central Rama 9',
+    agent: agents[0],
     featured: false,
     available: true,
-    yearBuilt: 1938,
+    yearBuilt: 2005,
     parking: 2,
-    coordinates: { lat: 34.1016, lng: -118.3337 },
+    coordinates: { lat: 13.7657, lng: 100.5672 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 11 — Palm Springs Desert Villa
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-11',
-    name: 'Palm Springs Desert Villa',
+    name: 'Hua Hin Seaside Villa',
     type: 'Villa',
-    location: 'Palm Springs, CA',
-    city: 'Palm Springs',
-    state: 'CA',
-    address: '1000 Tahquitz Canyon Way, Palm Springs, CA 92262',
-    price: 4500,
+    location: 'หัวหิน, ประจวบฯ',
+    city: 'หัวหิน',
+    state: 'ประจวบคีรีขันธ์',
+    address: '55 หมู่ 6 ตำบลหนองแก อำเภอหัวหิน ประจวบคีรีขันธ์ 77110',
+    price: 95000,
     priceType: 'month',
     rating: 4.8,
     reviewCount: 41,
@@ -514,33 +447,30 @@ export const properties: Property[] = [
     bathrooms: 3,
     area: 2600,
     landArea: 9000,
-    amenities: ['Pool', 'Hot Tub', 'Garden', 'Garage', 'Mountain Views', 'BBQ'],
+    amenities: ['Pool', 'Garden', 'Garage', 'BBQ', 'Beach Access', 'Security'],
     images: [
       'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'Classic mid-century modern architecture at its finest in Palm Springs. This iconic villa features walls of glass, terrazzo floors, and a dramatic saltwater pool set against the stunning San Jacinto Mountains. Fully furnished with authentic period pieces and all modern conveniences.',
-    agent: agents[1],    // Michael Chen
+      'วิลล่าริมทะเลสุดโรแมนติกในหัวหิน สถาปัตยกรรมแบบโมเดิร์นทรอปิคอลผสมโคโลเนียล สระว่ายน้ำส่วนตัว สวนจัดภูมิทัศน์สวยงาม และทางลงหาดส่วนตัว เหมาะสำหรับครอบครัวหรือผู้ที่ต้องการพักผ่อนอย่างมีระดับห่างจากเมือง',
+    agent: agents[1],
     featured: false,
     available: true,
-    yearBuilt: 1962,
+    yearBuilt: 2018,
     parking: 2,
-    coordinates: { lat: 33.8303, lng: -116.5453 },
+    coordinates: { lat: 12.5700, lng: 99.9573 },
   },
-  // ---------------------------------------------------------------------------
-  // 🏠 Property 12 — Pacific Heights Condo
-  // ---------------------------------------------------------------------------
   {
     id: 'prop-12',
-    name: 'Pacific Heights Condo',
+    name: 'Rama 9 Premium Condo',
     type: 'Condo',
-    location: 'San Francisco, CA',
-    city: 'San Francisco',
-    state: 'CA',
-    address: '2200 Broadway St, Unit 401, San Francisco, CA 94115',
-    price: 6200,
+    location: 'พระราม 9, กรุงเทพฯ',
+    city: 'กรุงเทพมหานคร',
+    state: 'กทม',
+    address: '1 ถนนพระราม 9 แขวงห้วยขวาง เขตห้วยขวาง กรุงเทพฯ 10310',
+    price: 55000,
     priceType: 'month',
     rating: 4.7,
     reviewCount: 27,
@@ -548,30 +478,24 @@ export const properties: Property[] = [
     bathrooms: 2,
     area: 1600,
     landArea: 0,
-    amenities: ['Gym', 'Doorman', 'Balcony', 'Parking', 'Storage', 'Views'],
+    amenities: ['Gym', 'Concierge', 'Balcony', 'Parking', 'Security', 'Pool'],
     images: [
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&auto=format&fit=crop&q=80',
     ],
     description:
-      'An elegant Pacific Heights condo with sweeping views of the Bay and Golden Gate Bridge. This stunning residence features floor-to-ceiling windows, Carrara marble bathrooms, and a chef\'s kitchen. Located in San Francisco\'s most prestigious neighborhood, just steps from boutique shops and acclaimed restaurants.',
-    agent: agents[2],    // Emily Rodriguez
+      'คอนโดพรีเมียมในย่านพระราม 9 ศูนย์กลางธุรกิจใหม่ของกรุงเทพฯ วิวเมืองงดงามจากระเบียงส่วนตัว ห้องน้ำหินอ่อนคาร์ราร่า ครัวพร้อมเครื่องใช้ครบครัน ทำเลใกล้ MRT พระราม 9 Central Rama 9 และสำนักงานชั้นนำมากมาย',
+    agent: agents[2],
     featured: false,
     available: true,
-    yearBuilt: 2014,
+    yearBuilt: 2016,
     parking: 1,
-    coordinates: { lat: 37.7952, lng: -122.4338 },
+    coordinates: { lat: 13.7560, lng: 100.5672 },
   },
 ];
 
-// =============================================================================
-// 🔍 Helper Functions — ฟังก์ชันช่วยดึงข้อมูล
-// =============================================================================
 //
-// 🔑 React JS vs Next.js — ทำไมใช้ import แทน API?
-// ─────────────────────────────────────────────────────
-// React JS (Client-only):
 //   // ต้อง fetch จาก API
 //   const [property, setProperty] = useState(null);
 //   useEffect(() => {
@@ -580,51 +504,36 @@ export const properties: Property[] = [
 //       .then(data => setProperty(data));
 //   }, [id]);
 //
-// Next.js (Server Component):
 //   // import ตรงๆ — ไม่ต้อง fetch, ไม่ต้อง useEffect
 //   import { getPropertyById } from '@/lib/mock-data';
 //   const property = getPropertyById(id);  // พร้อมใช้ทันที!
 //
-// ✅ ข้อดีของ Next.js approach:
 //   1. ไม่ต้อง loading state — ข้อมูลพร้อมตอน render
 //   2. SEO ดี — HTML มีข้อมูลครบ (ไม่ต้องรอ JavaScript load)
 //   3. เร็วกว่า — ไม่มี network round-trip
 //   4. Code สั้นกว่า — ไม่ต้อง useState + useEffect + loading/error handling
-// =============================================================================
 
-// -----------------------------------------------------------------------------
-// 🔍 getPropertyById — หา property ตาม id
-// -----------------------------------------------------------------------------
 // ใช้ใน: app/listings/[id]/page.tsx (หน้า detail ของ property)
 // return: Property object ถ้าเจอ, undefined ถ้าไม่เจอ (→ แสดง 404)
 //
-// 🔑 Array.find() = หา element แรกที่ตรงเงื่อนไข → คืน element นั้น
 //   ถ้าไม่เจอ → คืน undefined
 //   เทียบ SQL: SELECT * FROM properties WHERE id = ? LIMIT 1
 export function getPropertyById(id: string): Property | undefined {
   return properties.find((p) => p.id === id);
 }
 
-// -----------------------------------------------------------------------------
-// ⭐ getFeaturedProperties — ดึง properties ที่ featured: true
-// -----------------------------------------------------------------------------
 // ใช้ใน: app/page.tsx (หน้าแรก — แสดง featured properties 4 รายการ)
 // return: array ของ Property objects ที่ featured === true
 //
-// 🔑 Array.filter() = กรอง array เอาเฉพาะ element ที่ตรงเงื่อนไข
 //   คืน array ใหม่ (ไม่แก้ array เดิม)
 //   เทียบ SQL: SELECT * FROM properties WHERE featured = true
 export function getFeaturedProperties(): Property[] {
   return properties.filter((p) => p.featured);
 }
 
-// =============================================================================
-// 🏷️ ALL_AMENITIES — รายชื่อ amenities ทั้งหมดสำหรับ filter
-// =============================================================================
 // ใช้ใน: components/FilterSidebar.tsx (แสดง checkbox ให้ user เลือก filter)
 // เป็น array ของ string — ใช้ .map() สร้าง checkbox ใน UI
 //
-// 🔑 แยกออกมาเป็น constant เพราะ:
 //   1. FilterSidebar ใช้แสดง UI (checkbox)
 //   2. ListingsClient ใช้ filter properties ตาม amenities ที่เลือก
 //   3. ถ้าเพิ่ม amenity ใหม่ → แก้ที่เดียว ใช้ได้ทุกที่

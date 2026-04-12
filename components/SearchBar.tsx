@@ -1,56 +1,10 @@
-// =============================================================================
-// 📁 components/SearchBar.tsx — Search Bar พร้อม Autocomplete Dropdown
-// =============================================================================
-//
-// 🔑 ทำไมต้องเป็น Client Component?
-// ─────────────────────────────────────
-// SearchBar ต้องใช้ 'use client' เพราะ:
-//   1. useState()  — เก็บค่า search query + สถานะเปิด/ปิด dropdown
-//   2. useRouter() — navigate ไปหน้า /listings พร้อม query params
-//   3. onChange, onFocus, onBlur, onSubmit — event handlers จาก user
-//
-// 🔑 Programmatic Navigation — useRouter vs useNavigate:
-// ──────────────────────────────────────────────────────────
-// React JS:  const navigate = useNavigate();
-//            navigate('/listings?location=Bangkok');
-//            → ใช้ useNavigate() จาก react-router-dom
-//
-// Next.js:   const router = useRouter();
-//            router.push('/listings?location=Bangkok');
-//            → ใช้ useRouter() จาก next/navigation
-//            → ทั้งคู่ทำ client-side navigation (ไม่ reload หน้า)
-//
-// 🔑 ความแตกต่างเพิ่มเติม:
-//   React JS: navigate(-1)       ← ย้อนกลับ
-//   Next.js:  router.back()      ← ย้อนกลับ
-//   React JS: navigate(0)        ← refresh
-//   Next.js:  router.refresh()   ← refresh (แต่ไม่ reload ทั้งหน้า)
-//
-// 🔑 URL Query Parameters:
-// ──────────────────────────
-// ทั้ง React JS และ Next.js ใช้ encodeURIComponent() เพื่อ encode ค่าที่ใส่ใน URL
-// เช่น "Beverly Hills, CA" → "Beverly%20Hills%2C%20CA"
-// ป้องกันอักขระพิเศษทำให้ URL เสีย
-// =============================================================================
-
 'use client';
-// 🔑 Next.js: ต้องใส่ 'use client' เพราะ component นี้ใช้ hooks (useState, useRouter)
-// React JS: ไม่ต้องใส่บรรทัดนี้ เพราะทุก component เป็น client อยู่แล้ว
 
 import { useState } from 'react';
-// useState = hook สำหรับเก็บ state 2 ตัว: query (ข้อความ search) + showSuggestions (เปิด/ปิด dropdown)
 
 import { useRouter } from 'next/navigation';
-// 🔑 Next.js: useRouter จาก 'next/navigation' — ใช้ router.push() สำหรับ navigate
-// React JS: useNavigate จาก 'react-router-dom' — ใช้ navigate() สำหรับ navigate
-// ⚠️ Next.js มี useRouter 2 ตัว ระวังสับสน:
-//   - 'next/navigation' (App Router — ใช้ตัวนี้) ✅
-//   - 'next/router' (Pages Router — เก่าแล้ว ไม่ใช้) ❌
 
-// -----------------------------------------------------------------------------
-// 📋 Suggestions Data — รายชื่อเมืองสำหรับ autocomplete dropdown
 // ข้อมูล mock แบบ static — ในโปรเจกต์จริงอาจ fetch จาก API
-// -----------------------------------------------------------------------------
 const SUGGESTIONS = [
   'Beverly Hills, CA',
   'Santa Monica, CA',
@@ -61,46 +15,27 @@ const SUGGESTIONS = [
   'San Francisco, CA',
 ];
 
-// =============================================================================
-// 🏗️ Component หลัก — SearchBar
-// =============================================================================
 export default function SearchBar() {
-  // ---------------------------------------------------------------------------
-  // 🎯 State Management
-  // ---------------------------------------------------------------------------
   // query = ข้อความที่ user พิมพ์ใน search input
   const [query, setQuery] = useState('');
 
   // showSuggestions = true เมื่อต้องการแสดง dropdown suggestions
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // ---------------------------------------------------------------------------
   // 🧭 Router — สำหรับ programmatic navigation
-  // ---------------------------------------------------------------------------
-  // 🔑 Next.js: useRouter() → router.push('/path')
-  // React JS: useNavigate() → navigate('/path')
   const router = useRouter();
 
-  // ---------------------------------------------------------------------------
-  // 🔍 Filter Suggestions — กรอง suggestions ตาม query ที่พิมพ์
-  // ---------------------------------------------------------------------------
   // ใช้ .filter() + .includes() เพื่อหา suggestions ที่ตรงกับ query
   // .toLowerCase() เพื่อให้ case-insensitive (พิมพ์ "bev" ก็เจอ "Beverly")
   const filtered = SUGGESTIONS.filter((s) =>
     s.toLowerCase().includes(query.toLowerCase())
   );
 
-  // ---------------------------------------------------------------------------
-  // 📤 handleSubmit — เมื่อ user กด Enter หรือกดปุ่ม Search
-  // ---------------------------------------------------------------------------
   const handleSubmit = (e: React.FormEvent) => {
     // e.preventDefault() — ป้องกัน form submit แบบปกติ (ที่จะ reload หน้า)
-    // 🔑 React JS + Next.js เหมือนกัน: ต้อง preventDefault() ใน form submit เสมอ
     e.preventDefault();
 
     if (query.trim()) {
-      // 🔑 Next.js: router.push() — navigate พร้อม query parameter
-      // React JS: navigate(`/listings?location=${encodeURIComponent(query)}`)
       // encodeURIComponent() แปลงอักขระพิเศษ เช่น space → %20, comma → %2C
       router.push(`/listings?location=${encodeURIComponent(query.trim())}`);
     } else {
@@ -109,24 +44,17 @@ export default function SearchBar() {
     }
   };
 
-  // ---------------------------------------------------------------------------
-  // 🎯 handleSelect — เมื่อ user คลิกเลือก suggestion จาก dropdown
-  // ---------------------------------------------------------------------------
   const handleSelect = (suggestion: string) => {
     // 1. อัพเดท input ให้แสดงค่าที่เลือก
     setQuery(suggestion);
     // 2. ปิด dropdown
     setShowSuggestions(false);
     // 3. Navigate ไปหน้า listings พร้อม location ที่เลือก
-    // 🔑 Next.js: router.push() / React JS: navigate()
     router.push(`/listings?location=${encodeURIComponent(suggestion)}`);
   };
 
   return (
-    // =========================================================================
-    // 📦 Container — relative เพื่อให้ dropdown วางซ้อนได้ (absolute positioning)
     // max-w-2xl mx-auto = จำกัดความกว้าง + จัดกลาง
-    // =========================================================================
     <div className="relative w-full max-w-2xl mx-auto">
       {/* role="search" บอก screen reader ว่านี่คือ search form */}
       <form onSubmit={handleSubmit} role="search">
@@ -162,10 +90,6 @@ export default function SearchBar() {
             <input
               type="text"
               value={query}
-              // ─────────────────────────────────────────────────────────────
-              // 🔑 Controlled Input — value + onChange
-              // React JS + Next.js เหมือนกัน: ใช้ state ควบคุมค่า input
-              // ─────────────────────────────────────────────────────────────
               onChange={(e) => {
                 setQuery(e.target.value);
                 // แสดง suggestions เมื่อมีข้อความ (> 0 ตัวอักษร)
@@ -255,15 +179,11 @@ export default function SearchBar() {
               role="option"
               aria-selected={false}
               type="button"
-              // ─────────────────────────────────────────────────────────────
-              // 🔑 ทำไมใช้ onMouseDown แทน onClick?
-              // ─────────────────────────────────────────────────────────────
               // เพราะ input มี onBlur ที่จะปิด dropdown เมื่อ focus หายไป
               // ลำดับ event: onBlur (input) → onClick (button)
               // ถ้าใช้ onClick → dropdown ถูกปิดก่อนที่ click จะทำงาน!
               // onMouseDown เกิดก่อน onBlur → จึงใช้แทนเพื่อให้ click ทำงานได้
               // (setTimeout ใน onBlur 150ms ก็ช่วยเพิ่มอีกชั้น)
-              // ─────────────────────────────────────────────────────────────
               onMouseDown={() => handleSelect(suggestion)}
               className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
             >

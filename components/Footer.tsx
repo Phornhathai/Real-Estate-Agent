@@ -1,52 +1,8 @@
-// =============================================================================
-// 📁 components/Footer.tsx — Footer (Server Component)
-// =============================================================================
-//
-// 🔑 ทำไมเป็น Server Component?
-// ─────────────────────────────────
-// Footer ไม่มี interactivity ใดๆ:
-//   - ไม่มี useState (ไม่มี state ที่เปลี่ยนแปลง)
-//   - ไม่มี useEffect (ไม่มี side effects)
-//   - ไม่มี onClick handlers (ไม่มี event จาก user)
-//   - ไม่มี useRouter / usePathname (ไม่ต้องอ่าน URL)
-//   - เป็น static content ล้วนๆ — แค่แสดง links กับข้อความ
-//
-// ดังนั้น Next.js จะ render เป็น HTML บน server → ส่ง HTML สำเร็จรูปไป browser
-// ข้อดี: ไม่ส่ง JavaScript ของ Footer ไป browser เลย → หน้าโหลดเร็วขึ้น
-//
-// 🔑 Server Component vs Client Component:
-// ──────────────────────────────────────────
-// Server Component (ไม่มี 'use client'):
-//   - Render บน server แล้วส่ง HTML ไป browser
-//   - ไม่ส่ง JS bundle ไป client → เร็วกว่า
-//   - ใช้ได้เฉพาะ: static content, import data, async/await
-//   - ใช้ไม่ได้: useState, useEffect, onClick, browser APIs
-//
-// Client Component ('use client'):
-//   - Render บน browser (hydrate จาก HTML)
-//   - ส่ง JS bundle ไป client → ช้ากว่าเล็กน้อย
-//   - ใช้ได้ทุกอย่าง: hooks, events, browser APIs
-//
-// 🔑 React JS vs Next.js:
-// ────────────────────────
-// React JS:  ไม่มีแนวคิด Server/Client Component — ทุกอย่างเป็น client หมด
-//            → ส่ง JS ทั้งหมดไป browser ทุกครั้ง
-// Next.js:   แยก Server/Client → ส่งเฉพาะ JS ที่จำเป็น → performance ดีกว่า
-//
-// 🔑 สังเกต: ไฟล์นี้ไม่มี 'use client' บรรทัดแรก = Server Component โดยอัตโนมัติ
-// =============================================================================
-
 import Link from 'next/link';
-// 🔑 Next.js: <Link href="/path"> — client-side navigation ไม่ reload หน้า
-// React JS: <Link to="/path"> จาก react-router-dom
-// ⚠️ แม้ Footer จะเป็น Server Component แต่ใช้ <Link> ได้
 //    เพราะ Link component จัดการ client-side navigation ภายในตัวเอง
 
-// -----------------------------------------------------------------------------
-// 📋 Footer Links Data — ข้อมูลลิงก์ทั้งหมดแยกตาม category
 // จัดเป็น object ที่ key = ชื่อหมวด, value = array ของ links
 // ใช้ Object.entries() ด้านล่างเพื่อ loop render ทุกหมวด
-// -----------------------------------------------------------------------------
 const footerLinks = {
   Explore: [
     { label: 'Buy a Home', href: '/listings?tab=buy' },
@@ -72,13 +28,7 @@ const footerLinks = {
     { label: 'Cookie Policy', href: '/contact' },
   ],
 };
-
-// =============================================================================
-// 🏗️ Component หลัก — Footer
-// =============================================================================
-// ⚠️ ไม่มี 'use client' → เป็น Server Component
 // Server จะ render เป็น HTML สำเร็จรูป ไม่ส่ง JS ไป browser
-// 🔑 React JS: ไม่มีแนวคิดนี้ — ทุก component ส่ง JS ไป client เสมอ
 export default function Footer() {
   return (
     // role="contentinfo" บอก screen reader ว่านี่คือ footer ของหน้า
@@ -113,14 +63,14 @@ export default function Footer() {
                 </svg>
               </div>
               <span className="font-bold text-white text-lg">
-                Aum<span className="text-blue-400">Estate</span>
+                Real<span className="text-blue-400">Estate</span>
               </span>
             </Link>
             {/* คำอธิบายบริษัท */}
             {/* &apos; = HTML entity สำหรับ ' (apostrophe) — Next.js บังคับใช้แทน ' */}
             <p className="text-sm leading-relaxed mb-6">
               Your trusted partner in finding the perfect home. Premium properties across
-              California&apos;s most sought-after neighborhoods.
+              Thailand&apos;s most sought-after locations.
             </p>
 
             {/* ============================================================= */}
@@ -181,15 +131,23 @@ export default function Footer() {
         {/* flex-col sm:flex-row = แนวตั้งบน mobile, แนวนอนบน desktop */}
         <div className="border-t border-gray-800 mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* new Date().getFullYear() = ปีปัจจุบันอัตโนมัติ ไม่ต้อง hardcode */}
-          <p className="text-sm text-center sm:text-left">
-            &copy; {new Date().getFullYear()} AumEstate Studio. All rights reserved.
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-center sm:text-left">
+              &copy; {new Date().getFullYear()} Home Reality. All rights reserved.
+            </p>
+            <Link
+              href="/admin"
+              className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
+            >
+              Admin
+            </Link>
+          </div>
           <p className="text-sm">
             Made with{' '}
             <span className="text-red-400" aria-label="love">
               ♥
             </span>{' '}
-            in California
+            in Thailand
           </p>
         </div>
       </div>
