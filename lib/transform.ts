@@ -20,7 +20,6 @@ export function toProperty(p: PropertyFull): Property {
     type: p.type as Property['type'],
     location: p.location,
     city: p.city,
-    state: p.state,
     address: p.address,
     price: p.price,
     priceType: p.priceType as Property['priceType'],

@@ -229,7 +229,7 @@ export default function PropertyCard({ property, featured = false }: PropertyCar
         {/* ─────────────────────────────────────────────────────────────── */}
         {/* ⭐ Rating — ใช้ StarRating sub-component ด้านบน                */}
         {/* ─────────────────────────────────────────────────────────────── */}
-        <StarRating rating={property.rating} count={property.reviewCount} />
+        {/* <StarRating rating={property.rating} count={property.reviewCount} /> */}
 
         {/* ─────────────────────────────────────────────────────────────── */}
         {/* 💰 Price & CTA Button                                          */}

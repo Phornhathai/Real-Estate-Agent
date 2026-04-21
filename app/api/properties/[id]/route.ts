@@ -54,7 +54,6 @@ export async function PUT(
         type: body.type,
         location: body.location,
         city: body.city,
-        state: body.state,
         address: body.address,
         price: body.price,
         priceType: body.priceType,
@@ -94,20 +93,24 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    // ดึงรูปทั้งหมดก่อนลบ เพื่อเอา publicId ไปลบใน Cloudinary
     const images = await prisma.image.findMany({ where: { propertyId: id } });
 
-    // ลบรูปจาก Cloudinary
+    // ลบรูปจาก Cloudinary (skip ถ้า publicId ว่าง)
     await Promise.all(
-      images.map((img) => cloudinary.uploader.destroy(img.publicId))
+      images
+        .filter((img) => img.publicId)
+        .map((img) => cloudinary.uploader.destroy(img.publicId).catch(() => {}))
     );
 
-    // ลบ property (Image จะถูกลบอัตโนมัติเพราะ onDelete: Cascade)
+    // ลบ images ก่อน เผื่อ libsql ไม่ทำ cascade อัตโนมัติ
+    await prisma.image.deleteMany({ where: { propertyId: id } });
+
     await prisma.property.delete({ where: { id } });
 
     revalidateAll();
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error("[DELETE property]", err);
     return NextResponse.json(
       { error: "Failed to delete property" },
       { status: 500 }

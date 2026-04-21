@@ -108,7 +108,8 @@ export default function AgentForm({ agent }: Props) {
               {uploadingAvatar ? "กำลังอัปโหลด..." : "คลิกเพื่ออัปโหลดรูปโปรไฟล์"}
             </span>
             <span className="text-xs text-gray-400 text-center">
-              แนะนำ: <strong>400×400px</strong> ขึ้นไป · อัตราส่วน <strong>1:1 (สี่เหลี่ยมจัตุรัส)</strong> · JPG, PNG, WebP
+              แนะนำ: <strong>400×400px</strong> ขึ้นไป · อัตราส่วน{" "}
+              <strong>1:1 (สี่เหลี่ยมจัตุรัส)</strong> · JPG, PNG, WebP
             </span>
             <input
               type="file"
@@ -127,30 +128,48 @@ export default function AgentForm({ agent }: Props) {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล</label>
-          <input name="name" defaultValue={agent?.name} required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input
+            name="name"
+            defaultValue={agent?.name}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">อีเมล</label>
-            <input name="email" type="email" defaultValue={agent?.email} required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              name="email"
+              type="email"
+              defaultValue={agent?.email}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">เบอร์โทร</label>
-            <input name="phone" defaultValue={agent?.phone} required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              name="phone"
+              defaultValue={agent?.phone}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">ประสบการณ์ (ปี)</label>
-            <input name="experience" type="number" min={0} defaultValue={agent?.experience ?? 0}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              name="experience"
+              type="number"
+              min={0}
+              defaultValue={agent?.experience ?? 0}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Rating (0-5)</label>
             <input name="rating" type="number" min={0} max={5} step={0.1} defaultValue={agent?.rating ?? 0}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -159,13 +178,18 @@ export default function AgentForm({ agent }: Props) {
             <label className="block text-sm font-medium text-gray-700 mb-1">Listings ทั้งหมด</label>
             <input name="totalListings" type="number" min={0} defaultValue={agent?.totalListings ?? 0}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
+          </div> */}
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">ประวัติย่อ (Bio)</label>
-          <textarea name="bio" rows={4} defaultValue={agent?.bio} required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <textarea
+            name="bio"
+            rows={4}
+            defaultValue={agent?.bio}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
       </div>
 

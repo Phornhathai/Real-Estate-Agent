@@ -1,32 +1,10 @@
-import Link from 'next/link';
+import Link from "next/link";
 //    เพราะ Link component จัดการ client-side navigation ภายในตัวเอง
 
 // จัดเป็น object ที่ key = ชื่อหมวด, value = array ของ links
 // ใช้ Object.entries() ด้านล่างเพื่อ loop render ทุกหมวด
 const footerLinks = {
-  Explore: [
-    { label: 'Buy a Home', href: '/listings?tab=buy' },
-    { label: 'Rent a Home', href: '/listings?tab=rent' },
-    { label: 'Featured Listings', href: '/listings' },
-    { label: 'New Listings', href: '/listings' },
-  ],
-  Company: [
-    { label: 'About Us', href: '/contact' },
-    { label: 'Our Agents', href: '/contact' },
-    { label: 'Careers', href: '/contact' },
-    { label: 'Press', href: '/contact' },
-  ],
-  Resources: [
-    { label: 'Blog', href: '/contact' },
-    { label: 'Market Reports', href: '/contact' },
-    { label: 'Mortgage Calculator', href: '/contact' },
-    { label: 'FAQ', href: '/contact' },
-  ],
-  Legal: [
-    { label: 'Privacy Policy', href: '/contact' },
-    { label: 'Terms of Service', href: '/contact' },
-    { label: 'Cookie Policy', href: '/contact' },
-  ],
+  Company: [{ label: "About Us", href: "/contact" }],
 };
 // Server จะ render เป็น HTML สำเร็จรูป ไม่ส่ง JS ไป browser
 export default function Footer() {
@@ -36,20 +14,16 @@ export default function Footer() {
       {/* max-w-7xl mx-auto = จำกัดความกว้างสูงสุด + จัดกลาง */}
       {/* Responsive padding: px-4 (mobile) → sm:px-6 → lg:px-8 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-
         {/* ================================================================= */}
         {/* 📐 Grid Layout — Responsive columns                               */}
         {/* ================================================================= */}
         {/* grid-cols-2 = 2 คอลัมน์บน mobile */}
         {/* md:grid-cols-5 = 5 คอลัมน์บน desktop (1 brand + 4 link groups) */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
           {/* =============================================================== */}
           {/* 🏠 Brand Column — Logo + คำอธิบาย + Social links                */}
           {/* =============================================================== */}
-          {/* col-span-2 = กินพื้นที่ 2 คอลัมน์บน mobile (เต็มแถว) */}
-          {/* md:col-span-1 = กินแค่ 1 คอลัมน์บน desktop */}
-          <div className="col-span-2 md:col-span-1">
+          <div>
             {/* Logo — เหมือนใน Navbar แต่สี text เป็นขาว (เพราะ bg มืด) */}
             {/* 🔑 Next.js: <Link href="/"> / React JS: <Link to="/"> */}
             <Link href="/" className="flex items-center gap-2 mb-4">
@@ -63,7 +37,7 @@ export default function Footer() {
                 </svg>
               </div>
               <span className="font-bold text-white text-lg">
-                Real<span className="text-blue-400">Estate</span>
+                Home<span className="text-blue-400">Reality</span>
               </span>
             </Link>
             {/* คำอธิบายบริษัท */}
@@ -80,21 +54,33 @@ export default function Footer() {
             {/* 🔑 <Link> = internal navigation (ภายในเว็บเรา) */}
             {/*     <a>    = external links หรือ links ที่ยังไม่มีหน้า (href="#") */}
             <div className="flex gap-3" aria-label="Social media links">
-              {['Twitter', 'Facebook', 'Instagram', 'LinkedIn'].map((platform) => (
-                <a
-                  key={platform}
-                  href="#"
-                  aria-label={platform}
-                  className="w-9 h-9 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+              <a
+                href="https://www.google.com/"
+                aria-label="Facebook"
+                className="w-9 h-9 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
+                </svg>
+              </a>
+              <a
+                href="#"
+                aria-label="Instagram"
+                className="w-9 h-9 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
-                  {/* sr-only = ซ่อนจากตา แต่ screen reader อ่านได้ (accessibility) */}
-                  <span className="sr-only">{platform}</span>
-                  {/* Placeholder icon — ใช้วงกลมแทน icon จริง (mock) */}
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="12" r="4" />
-                  </svg>
-                </a>
-              ))}
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+                </svg>
+              </a>
             </div>
           </div>
 
@@ -104,17 +90,12 @@ export default function Footer() {
           {/* Object.entries() แปลง { Explore: [...], Company: [...] } */}
           {/* เป็น [['Explore', [...]], ['Company', [...]]] เพื่อ loop ได้ */}
           {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              {/* หัวข้อหมวด — สีขาวเพื่อเน้นเหนือ links สีเทา */}
+            <div key={category} className="flex flex-col items-center text-center">
               <h3 className="text-white font-semibold text-sm mb-4">{category}</h3>
-              <ul className="space-y-3">
+              <ul className="flex">
                 {links.map((link) => (
                   <li key={link.label}>
-                    {/* 🔑 ใช้ <Link> เพราะเป็น internal links ภายในเว็บเรา */}
-                    <Link
-                      href={link.href}
-                      className="text-sm hover:text-white transition-colors"
-                    >
+                    <Link href={link.href} className="text-sm hover:text-white transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -143,10 +124,10 @@ export default function Footer() {
             </Link>
           </div>
           <p className="text-sm">
-            Made with{' '}
+            Made with{" "}
             <span className="text-red-400" aria-label="love">
               ♥
-            </span>{' '}
+            </span>{" "}
             in Thailand
           </p>
         </div>

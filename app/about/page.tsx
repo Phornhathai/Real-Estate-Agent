@@ -4,7 +4,8 @@ import Link from "next/link";
 
 export const metadata = {
   title: "About Us — Home Reality",
-  description: "Meet our team of experienced real estate agents dedicated to helping you find your perfect home.",
+  description:
+    "Meet our team of experienced real estate agents dedicated to helping you find your perfect home.",
 };
 
 export default async function AboutPage() {
@@ -12,13 +13,12 @@ export default async function AboutPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-
       {/* Hero */}
       <div className="text-center mb-16">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">About Home Reality</h1>
         <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-          We're a team of passionate real estate professionals dedicated to helping
-          you find the perfect property across Thailand — whether you're buying, renting, or investing.
+          We're a team of passionate real estate professionals dedicated to helping you find the
+          perfect property across Thailand — whether you're buying, renting, or investing.
         </p>
       </div>
 
@@ -41,7 +41,10 @@ export default async function AboutPage() {
             desc: "Dedicated agent support from your first inquiry to the day you get your keys.",
           },
         ].map((item) => (
-          <div key={item.title} className="bg-white rounded-xl border border-gray-100 p-6 text-center">
+          <div
+            key={item.title}
+            className="bg-white rounded-xl border border-gray-100 p-6 text-center"
+          >
             <div className="text-4xl mb-3">{item.icon}</div>
             <h3 className="font-semibold text-gray-900 mb-2">{item.title}</h3>
             <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
@@ -58,7 +61,10 @@ export default async function AboutPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {agents.map((agent) => (
-              <div key={agent.id} className="bg-white rounded-xl border border-gray-100 p-6 text-center">
+              <div
+                key={agent.id}
+                className="bg-white rounded-xl border border-gray-100 p-6 text-center"
+              >
                 <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-100 mx-auto mb-4">
                   {agent.avatar ? (
                     <Image
@@ -76,12 +82,12 @@ export default async function AboutPage() {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-1">{agent.name}</h3>
                 <p className="text-xs text-gray-500 mb-3">{agent.experience} years experience</p>
-                <p className="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-3">{agent.bio}</p>
-                <div className="flex justify-center gap-3 text-xs text-gray-500">
-                  <span>⭐ {agent.rating.toFixed(1)}</span>
-                  <span>·</span>
+                <p className="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-3">
+                  {agent.bio}
+                </p>
+                {/* <div className="flex justify-center gap-3 text-xs text-gray-500">
                   <span>{agent.totalListings} listings</span>
-                </div>
+                </div> */}
               </div>
             ))}
           </div>
@@ -91,7 +97,9 @@ export default async function AboutPage() {
       {/* CTA */}
       <div className="bg-blue-600 rounded-2xl p-10 text-center text-white">
         <h2 className="text-2xl font-bold mb-3">Ready to find your perfect home?</h2>
-        <p className="text-blue-100 mb-6">Browse our curated listings across Bangkok, Chiang Mai, Phuket and more.</p>
+        <p className="text-blue-100 mb-6">
+          Browse our curated listings across Bangkok, Chiang Mai, Phuket and more.
+        </p>
         <div className="flex justify-center gap-3 flex-wrap">
           <Link
             href="/listings"
@@ -107,7 +115,6 @@ export default async function AboutPage() {
           </Link>
         </div>
       </div>
-
     </main>
   );
 }

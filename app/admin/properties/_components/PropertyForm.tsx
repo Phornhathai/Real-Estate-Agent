@@ -22,7 +22,6 @@ interface Property {
   type: string;
   location: string;
   city: string;
-  state: string;
   address: string;
   price: number;
   priceType: string;
@@ -46,8 +45,16 @@ interface Props {
 }
 
 const AMENITY_OPTIONS = [
-  "Pool", "Gym", "Garden", "Garage", "Security",
-  "Smart Home", "Parking", "Balcony", "Elevator", "Pet Friendly",
+  "Pool",
+  "Gym",
+  "Garden",
+  "Garage",
+  "Security",
+  "Smart Home",
+  "Parking",
+  "Balcony",
+  "Elevator",
+  "Pet Friendly",
 ];
 
 export default function PropertyForm({ agents, property }: Props) {
@@ -58,7 +65,7 @@ export default function PropertyForm({ agents, property }: Props) {
   const [uploadingImages, setUploadingImages] = useState(false);
   const [images, setImages] = useState<PropertyImage[]>(property?.images ?? []);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(
-    property ? JSON.parse(property.amenities) : []
+    property ? JSON.parse(property.amenities) : [],
   );
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -108,7 +115,6 @@ export default function PropertyForm({ agents, property }: Props) {
       type: formData.get("type"),
       location: formData.get("location"),
       city: formData.get("city"),
-      state: formData.get("state"),
       address: formData.get("address"),
       price: Number(formData.get("price")),
       priceType: formData.get("priceType"),
@@ -138,14 +144,14 @@ export default function PropertyForm({ agents, property }: Props) {
     if (res.ok) {
       const data = await res.json();
 
-      // ถ้าเป็นการสร้างใหม่ ต้องบันทึกรูปภาพลง database
-      if (!isEdit && images.length > 0) {
+      const newImages = images.filter((img) => img.id === "");
+      if (newImages.length > 0) {
         await fetch("/api/images", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            propertyId: data.id,
-            images: images,
+            propertyId: isEdit ? property.id : data.id,
+            images: newImages,
           }),
         });
       }
@@ -185,7 +191,8 @@ export default function PropertyForm({ agents, property }: Props) {
             {uploadingImages ? "กำลังอัปโหลด..." : "คลิกเพื่ออัปโหลดรูป (เลือกได้หลายรูป)"}
           </span>
           <span className="text-xs text-gray-400">
-            แนะนำ: <strong>1280×720px</strong> ขึ้นไป · อัตราส่วน <strong>16:9</strong> · JPG, PNG, WebP · ไม่เกิน 10MB ต่อรูป
+            แนะนำ: <strong>1280×720px</strong> ขึ้นไป · อัตราส่วน <strong>16:9</strong> · JPG, PNG,
+            WebP · ไม่เกิน 10MB ต่อรูป
           </span>
           <input
             type="file"
@@ -205,60 +212,91 @@ export default function PropertyForm({ agents, property }: Props) {
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อ Property</label>
-            <input name="name" defaultValue={property?.name} required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              name="name"
+              defaultValue={property?.name}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">ประเภท</label>
-            <select name="type" defaultValue={property?.type ?? "House"}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select
+              name="type"
+              defaultValue={property?.type ?? "House"}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
               {["House", "Villa", "Apartment", "Condo"].map((t) => (
-                <option key={t} value={t}>{t}</option>
+                <option key={t} value={t}>
+                  {t}
+                </option>
               ))}
             </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Agent</label>
-            <select name="agentId" defaultValue={property?.agentId} required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select
+              name="agentId"
+              defaultValue={property?.agentId}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
               <option value="">-- เลือก Agent --</option>
               {agents.map((a) => (
-                <option key={a.id} value={a.id}>{a.name}</option>
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Location (แสดงใน card)</label>
-            <input name="location" defaultValue={property?.location} required placeholder="Bankgok"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Location (แสดงใน card)
+            </label>
+            <input
+              name="location"
+              defaultValue={property?.location}
+              required
+              placeholder="Bankgok"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-            <input name="city" defaultValue={property?.city} required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              City (แสดงใน Exlore)
+            </label>
+            <input
+              name="city"
+              defaultValue={property?.city}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-            <input name="state" defaultValue={property?.state} required placeholder="BK"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">ที่อยู่เต็ม</label>
-            <input name="address" defaultValue={property?.address} required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">ที่อยู่</label>
+            <textarea
+              name="address"
+              defaultValue={property?.address}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
         </div>
 
         <div className="col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">คำอธิบาย</label>
-          <textarea name="description" defaultValue={property?.description} required rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <textarea
+            name="description"
+            defaultValue={property?.description}
+            required
+            rows={4}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
       </div>
 
@@ -268,46 +306,92 @@ export default function PropertyForm({ agents, property }: Props) {
         <div className="grid grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">ราคา</label>
-            <input name="price" type="number" defaultValue={property?.price} required min={0}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              name="price"
+              type="number"
+              defaultValue={property?.price}
+              required
+              min={0}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">หน่วย</label>
-            <select name="priceType" defaultValue={property?.priceType ?? "month"}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select
+              name="priceType"
+              defaultValue={property?.priceType ?? "month"}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
               <option value="month">/ month</option>
               <option value="year">/ year</option>
             </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">ปีที่สร้าง</label>
-            <input name="yearBuilt" type="number" defaultValue={property?.yearBuilt} required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              name="yearBuilt"
+              type="number"
+              defaultValue={property?.yearBuilt}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">ห้องนอน</label>
-            <input name="bedrooms" type="number" defaultValue={property?.bedrooms} required min={0}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              name="bedrooms"
+              type="number"
+              defaultValue={property?.bedrooms}
+              required
+              min={0}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">ห้องน้ำ</label>
-            <input name="bathrooms" type="number" defaultValue={property?.bathrooms} required min={0}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              name="bathrooms"
+              type="number"
+              defaultValue={property?.bathrooms}
+              required
+              min={0}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">ที่จอดรถ</label>
-            <input name="parking" type="number" defaultValue={property?.parking ?? 0} min={0}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              name="parking"
+              type="number"
+              defaultValue={property?.parking ?? 0}
+              min={0}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">พื้นที่ใช้สอย (ตร.ม.)</label>
-            <input name="area" type="number" defaultValue={property?.area} required min={0}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              พื้นที่ใช้สอย (ตร.ม.)
+            </label>
+            <input
+              name="area"
+              type="number"
+              defaultValue={property?.area}
+              required
+              min={0}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">พื้นที่ดิน (ตร.ม.)</label>
-            <input name="landArea" type="number" defaultValue={property?.landArea ?? 0} min={0}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              พื้นที่ดิน (ตร.ม.)
+            </label>
+            <input
+              name="landArea"
+              type="number"
+              defaultValue={property?.landArea ?? 0}
+              min={0}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
         </div>
       </div>
@@ -322,7 +406,7 @@ export default function PropertyForm({ agents, property }: Props) {
               type="button"
               onClick={() =>
                 setSelectedAmenities((prev) =>
-                  prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]
+                  prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a],
                 )
               }
               className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
@@ -342,13 +426,21 @@ export default function PropertyForm({ agents, property }: Props) {
         <h2 className="font-semibold text-gray-900 mb-4">Settings</h2>
         <div className="flex gap-6">
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" name="available" defaultChecked={property?.available ?? true}
-              className="w-4 h-4 rounded" />
+            <input
+              type="checkbox"
+              name="available"
+              defaultChecked={property?.available ?? true}
+              className="w-4 h-4 rounded"
+            />
             <span className="text-sm text-gray-700">Available</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" name="featured" defaultChecked={property?.featured ?? false}
-              className="w-4 h-4 rounded" />
+            <input
+              type="checkbox"
+              name="featured"
+              defaultChecked={property?.featured ?? false}
+              className="w-4 h-4 rounded"
+            />
             <span className="text-sm text-gray-700">Featured (แสดงหน้าแรก)</span>
           </label>
         </div>

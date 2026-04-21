@@ -39,7 +39,6 @@ export async function POST(request: NextRequest) {
         type: body.type,
         location: body.location,
         city: body.city,
-        state: body.state,
         address: body.address,
         price: body.price,
         priceType: body.priceType,
@@ -67,10 +66,8 @@ export async function POST(request: NextRequest) {
     revalidateAll();
     return NextResponse.json(property, { status: 201 });
   } catch (e) {
-    console.error(e);
-    return NextResponse.json(
-      { error: "Failed to create property" },
-      { status: 500 }
-    );
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[POST property]", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import cloudinary from "@/lib/cloudinary";
 
@@ -19,6 +20,11 @@ export async function DELETE(
 
     // ลบออกจาก Database
     await prisma.image.delete({ where: { id } });
+
+    revalidatePath("/");
+    revalidatePath("/listings");
+    revalidatePath("/admin/properties");
+    revalidatePath(`/listings/${image.propertyId}`);
 
     return NextResponse.json({ success: true });
   } catch {

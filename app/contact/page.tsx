@@ -151,7 +151,7 @@ export default async function ContactPage() {
                   <div className="shrink-0 flex flex-col items-center gap-3">
                     <div className="p-3 bg-white rounded-2xl border-2 border-[#06C755] shadow-md">
                       <Image
-                        src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://line.me/ti/p/~homereality&color=06C755&bgcolor=ffffff&margin=4"
+                        src="/qr-line.png"
                         alt="LINE QR Code — Home Reality"
                         width={180}
                         height={180}

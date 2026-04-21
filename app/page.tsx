@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 import Image from 'next/image';
 
 import Link from 'next/link';
@@ -31,14 +33,6 @@ export const metadata: Metadata = {
 };
 
 // 📊 Static Data — ข้อมูลที่ไม่เปลี่ยน (constants)
-
-// 📈 Stats — ตัวเลขสถิติที่แสดงใน Stats Bar
-const STATS = [
-  { value: '2,400+', label: 'Properties Listed' },
-  { value: '150+', label: 'Expert Agents' },
-  { value: '30+', label: 'Cities Covered' },
-  { value: '98%', label: 'Client Satisfaction' },
-];
 
 // ✨ Features — จุดเด่นที่แสดงใน "Why Choose Us" section
 const FEATURES = [
@@ -80,15 +74,7 @@ const FEATURES = [
   },
 ];
 
-// 📍 Locations — ข้อมูล location สำหรับ "Browse by Location" section
-const LOCATIONS = [
-  { name: 'Bangkok', count: 48, image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=400&auto=format&fit=crop&q=80' },
-  { name: 'Chiang Mai', count: 24, image: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&auto=format&fit=crop&q=80' },
-  { name: 'Phuket', count: 31, image: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=400&auto=format&fit=crop&q=80' },
-  { name: 'Pattaya', count: 19, image: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=400&auto=format&fit=crop&q=80' },
-  { name: 'Hua Hin', count: 14, image: 'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=400&auto=format&fit=crop&q=80' },
-  { name: 'Koh Samui', count: 11, image: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57?w=400&auto=format&fit=crop&q=80' },
-];
+const CITY_IMAGE_FALLBACK = 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&auto=format&fit=crop&q=80';
 
 //   - render บน server → HTML สำเร็จรูปส่งให้ browser
 //   - เรียก getFeaturedProperties() ตรงๆ (ไม่ต้อง useEffect + useState)
@@ -105,13 +91,40 @@ const LOCATIONS = [
 //   }, []);
 //   if (loading) return <Spinner />;
 export default async function HomePage() {
-  const prismaFeatured = await prisma.property.findMany({
-    where: { featured: true },
-    include: { images: { orderBy: { order: 'asc' } }, agent: true },
-    take: 4,
-    orderBy: { createdAt: 'desc' },
-  });
+  const [prismaFeatured, totalCount, agentCount, cityGroups, cityLatestProps] = await Promise.all([
+    prisma.property.findMany({
+      where: { featured: true },
+      include: { images: { orderBy: { order: 'asc' } }, agent: true },
+      take: 4,
+      orderBy: { createdAt: 'desc' },
+    }).catch(() => []),
+    prisma.property.count().catch(() => 0),
+    prisma.agent.count().catch(() => 0),
+    prisma.property.groupBy({ by: ['city'], _count: { city: true }, orderBy: { _count: { city: 'desc' } } }).catch(() => []),
+    prisma.property.findMany({
+      distinct: ['city'],
+      orderBy: { createdAt: 'desc' },
+      select: { city: true, images: { take: 1, orderBy: { order: 'asc' } } },
+    }).catch(() => []),
+  ]);
   const featured = prismaFeatured.map(toProperty);
+
+  const cityImageMap = Object.fromEntries(
+    cityLatestProps.map((p) => [p.city, p.images[0]?.url ?? CITY_IMAGE_FALLBACK])
+  );
+
+  const LOCATIONS = cityGroups.map((g) => ({
+    name: g.city,
+    count: g._count.city,
+    image: cityImageMap[g.city] ?? CITY_IMAGE_FALLBACK,
+  }));
+
+  const STATS = [
+    { value: totalCount.toLocaleString(), label: 'Properties Listed' },
+    { value: agentCount.toLocaleString(), label: 'Expert Agents' },
+    { value: cityGroups.length.toLocaleString(), label: 'Cities Covered' },
+    { value: '98%', label: 'Client Satisfaction' },
+  ];
 
   return (
     <>
@@ -154,7 +167,7 @@ export default async function HomePage() {
             {/* Eyebrow — badge เล็กๆ เหนือ heading */}
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400" aria-hidden="true" />
-              2,400+ properties available now
+              {totalCount} {totalCount === 1 ? 'property' : 'properties'} available now
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5">
@@ -266,7 +279,7 @@ export default async function HomePage() {
       {/* ================================================================= */}
       {/* 📍 Browse by Location — สำรวจตามทำเล                             */}
       {/* ================================================================= */}
-      <section className="py-16 lg:py-20 bg-white" aria-labelledby="locations-heading">
+      {LOCATIONS.length > 0 && <section className="py-16 lg:py-20 bg-white" aria-labelledby="locations-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <p className="text-blue-600 font-medium text-sm mb-2">✦ Explore</p>
@@ -305,7 +318,7 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* ================================================================= */}
       {/* 🏆 Why Choose Us — จุดเด่นของเว็บ                                */}

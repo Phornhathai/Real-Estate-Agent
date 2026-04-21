@@ -34,18 +34,20 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
 
   // ---------------------------------------------------------------------------
-  // ⚡ Turbopack — Bundler สมัยใหม่ (เขียนด้วย Rust)
+  // ⚡ Turbopack root — บอก Turbopack ว่า project root อยู่ที่ไหน
   // ---------------------------------------------------------------------------
-  // 🔑 React JS: ใช้ Webpack (ช้า) หรือ Vite (เร็ว, ใช้ esbuild)
-  // 🔑 Next.js 15: Turbopack เป็น bundler ในตัว เร็วกว่า Webpack 10x
-  //   - เปิดใช้ด้วย `next dev --turbopack` ในคำสั่ง dev
-  //   - root = บอก Turbopack ว่า root directory ของโปรเจกต์อยู่ที่ไหน
-  //   - __dirname = ค่า built-in ของ Node.js ชี้ไปที่โฟลเดอร์ของไฟล์นี้
+  // ป้องกัน Next.js 16 เลือกผิด workspace root (เช่น ~/pnpm-lock.yaml)
+  // ซึ่งทำให้ Turbopack scan node_modules ผิดที่และช้ามาก
   turbopack: {
     root: __dirname,
-    // __dirname = path ของโฟลเดอร์ที่ไฟล์ next.config.ts อยู่
-    // ช่วยให้ Turbopack resolve ไฟล์ได้ถูกต้อง
   },
+
+  // ---------------------------------------------------------------------------
+  // 📦 Server External Packages — ห้าม bundle packages ที่มี native binaries
+  // ---------------------------------------------------------------------------
+  // @libsql/client ใช้ native .node binary (@libsql/darwin-arm64)
+  // Turbopack ไม่สามารถ bundle native modules ได้ → ต้อง require() ตอน runtime แทน
+  serverExternalPackages: ['@libsql/client', '@prisma/adapter-libsql', '@prisma/client'],
 
   // ---------------------------------------------------------------------------
   // 🖼️ Images — ตั้งค่า next/image component

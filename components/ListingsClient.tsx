@@ -73,7 +73,6 @@ export default function ListingsClient({ initialProperties }: Props) {
       result = result.filter(
         (p) =>
           p.city.toLowerCase().includes(q) ||
-          p.state.toLowerCase().includes(q) ||
           p.location.toLowerCase().includes(q) ||
           p.address.toLowerCase().includes(q)
       );

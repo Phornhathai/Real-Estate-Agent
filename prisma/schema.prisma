@@ -10,6 +10,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = env("TURSO_DATABASE_URL")
 }
 
 // =============================================================================
@@ -42,7 +43,6 @@ model Property {
   type        String       // 'House' | 'Villa' | 'Apartment' | 'Condo'
   location    String       // เช่น 'Beverly Hills, CA'
   city        String
-  state       String
   address     String
   price       Float
   priceType   String       // 'month' | 'year'

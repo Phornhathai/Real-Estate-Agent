@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
-import Link from 'next/link';
+import Link from "next/link";
 
-import { usePathname } from 'next/navigation';
+import { usePathname } from "next/navigation";
 
 // แยกเป็น array เพื่อ loop render ได้ง่าย ไม่ต้องเขียน <Link> ซ้ำหลายตัว
 const navLinks = [
-  { href: '/listings', label: 'Buy' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
+  { href: "/listings", label: "Buy" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function Navbar() {
@@ -29,7 +29,6 @@ export default function Navbar() {
         {/* Container หลัก — flex จัดเรียง logo, links, actions ในแนวนอน */}
         {/* h-16 = ความสูงคงที่ 64px */}
         <div className="flex items-center justify-between h-16">
-
           {/* ================================================================= */}
           {/* 🏠 Logo — กดแล้วกลับหน้าแรก                                       */}
           {/* ================================================================= */}
@@ -65,8 +64,8 @@ export default function Navbar() {
                 //   pathname === link.href ? 'active styles' : 'normal styles'
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   pathname === link.href
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? "text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
                 {link.label}
@@ -140,7 +139,7 @@ export default function Navbar() {
               aria-label="User account"
               className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white text-sm font-semibold shrink-0"
             >
-              A
+              B
             </button>
 
             {/* ============================================================= */}
@@ -151,17 +150,39 @@ export default function Navbar() {
             <button
               className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
               onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
             >
               {/* สลับ icon ระหว่าง X (ปิด) กับ hamburger (เปิด) */}
               {mobileOpen ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               )}
             </button>

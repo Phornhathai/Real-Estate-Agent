@@ -45,9 +45,9 @@ interface FilterSidebarProps {
 export const DEFAULT_FILTERS: FilterValues = {
   location: '',
   priceMin: 0,
-  priceMax: 20000,
+  priceMax: 99_999_999,
   areaMin: 0,
-  areaMax: 10000,
+  areaMax: 99_999,
   types: [],
   amenities: [],
 };
@@ -83,9 +83,9 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Filter
   const hasActiveFilters =
     filters.location !== '' ||
     filters.priceMin > 0 ||
-    filters.priceMax < 20000 ||
+    filters.priceMax < 99_999_999 ||
     filters.areaMin > 0 ||
-    filters.areaMax < 10000 ||
+    filters.areaMax < 99_999 ||
     filters.types.length > 0 ||
     filters.amenities.length > 0;
 

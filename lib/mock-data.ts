@@ -50,7 +50,6 @@ export interface Property {
   type: PropertyType;    // ประเภท: 'House' | 'Villa' | 'Apartment' | 'Condo'
   location: string;      // ที่ตั้งแบบย่อ เช่น 'Beverly Hills, CA' (ใช้แสดงใน card)
   city: string;          // เมือง — ใช้ filter ตาม location
-  state: string;         // รัฐ เช่น 'CA'
   address: string;       // ที่อยู่เต็ม — ใช้ในหน้า detail
   price: number;         // ราคา (ต่อเดือน/ปี) — ใช้ filter ตาม price range
   priceType: 'month' | 'year';  // หน่วยราคา — แสดงเป็น "/month" หรือ "/year"
@@ -126,7 +125,6 @@ export const properties: Property[] = [
     type: 'Villa',
     location: 'สุขุมวิท, กรุงเทพฯ',
     city: 'กรุงเทพมหานคร',
-    state: 'กทม',
     address: '123 ซอยสุขุมวิท 31 แขวงคลองเตยเหนือ เขตวัฒนา กรุงเทพฯ 10110',
     price: 120000,
     priceType: 'month',
@@ -158,7 +156,6 @@ export const properties: Property[] = [
     type: 'House',
     location: 'นิมมานเหมินทร์, เชียงใหม่',
     city: 'เชียงใหม่',
-    state: 'เชียงใหม่',
     address: '88 ถนนนิมมานเหมินทร์ ตำบลสุเทพ อำเภอเมือง เชียงใหม่ 50200',
     price: 45000,
     priceType: 'month',
@@ -189,7 +186,6 @@ export const properties: Property[] = [
     type: 'Apartment',
     location: 'สีลม, กรุงเทพฯ',
     city: 'กรุงเทพมหานคร',
-    state: 'กทม',
     address: '999 ถนนสีลม แขวงสีลม เขตบางรัก กรุงเทพฯ 10500',
     price: 65000,
     priceType: 'month',
@@ -220,7 +216,6 @@ export const properties: Property[] = [
     type: 'Condo',
     location: 'ทองหล่อ, กรุงเทพฯ',
     city: 'กรุงเทพมหานคร',
-    state: 'กทม',
     address: '55 ซอยทองหล่อ 13 แขวงคลองตันเหนือ เขตวัฒนา กรุงเทพฯ 10110',
     price: 85000,
     priceType: 'month',
@@ -251,7 +246,6 @@ export const properties: Property[] = [
     type: 'Villa',
     location: 'กะตะ, ภูเก็ต',
     city: 'ภูเก็ต',
-    state: 'ภูเก็ต',
     address: '15 หมู่ 4 ตำบลกะรน อำเภอเมือง ภูเก็ต 83100',
     price: 200000,
     priceType: 'month',
@@ -282,7 +276,6 @@ export const properties: Property[] = [
     type: 'Apartment',
     location: 'อโศก, กรุงเทพฯ',
     city: 'กรุงเทพมหานคร',
-    state: 'กทม',
     address: '159 ถนนสุขุมวิท 21 แขวงคลองเตยเหนือ เขตวัฒนา กรุงเทพฯ 10110',
     price: 150000,
     priceType: 'month',
@@ -313,7 +306,6 @@ export const properties: Property[] = [
     type: 'House',
     location: 'เมืองเก่า, เชียงใหม่',
     city: 'เชียงใหม่',
-    state: 'เชียงใหม่',
     address: '42 ถนนพระปกเกล้า ตำบลพระสิงห์ อำเภอเมือง เชียงใหม่ 50200',
     price: 35000,
     priceType: 'month',
@@ -344,7 +336,6 @@ export const properties: Property[] = [
     type: 'House',
     location: 'จอมเทียน, พัทยา',
     city: 'พัทยา',
-    state: 'ชลบุรี',
     address: '88/5 หมู่ 12 ตำบลหนองปรือ อำเภอบางละมุง ชลบุรี 20150',
     price: 75000,
     priceType: 'month',
@@ -375,7 +366,6 @@ export const properties: Property[] = [
     type: 'Apartment',
     location: 'อารีย์, กรุงเทพฯ',
     city: 'กรุงเทพมหานคร',
-    state: 'กทม',
     address: '22 ซอยอารีย์สัมพันธ์ 4 แขวงสามเสนใน เขตพญาไท กรุงเทพฯ 10400',
     price: 38000,
     priceType: 'month',
@@ -406,7 +396,6 @@ export const properties: Property[] = [
     type: 'House',
     location: 'รัชดาภิเษก, กรุงเทพฯ',
     city: 'กรุงเทพมหานคร',
-    state: 'กทม',
     address: '99 ซอยรัชดาภิเษก 7 แขวงดินแดง เขตดินแดง กรุงเทพฯ 10400',
     price: 68000,
     priceType: 'month',
@@ -437,7 +426,6 @@ export const properties: Property[] = [
     type: 'Villa',
     location: 'หัวหิน, ประจวบฯ',
     city: 'หัวหิน',
-    state: 'ประจวบคีรีขันธ์',
     address: '55 หมู่ 6 ตำบลหนองแก อำเภอหัวหิน ประจวบคีรีขันธ์ 77110',
     price: 95000,
     priceType: 'month',
@@ -468,7 +456,6 @@ export const properties: Property[] = [
     type: 'Condo',
     location: 'พระราม 9, กรุงเทพฯ',
     city: 'กรุงเทพมหานคร',
-    state: 'กทม',
     address: '1 ถนนพระราม 9 แขวงห้วยขวาง เขตห้วยขวาง กรุงเทพฯ 10310',
     price: 55000,
     priceType: 'month',
