@@ -153,7 +153,7 @@ export default async function HomePage() {
           {/*   fill = เต็ม parent container, sizes = บอก browser ว่าภาพกว้างเท่าไหร่ */}
           {/*   priority = โหลดรูปนี้ก่อน (above the fold) ไม่ lazy load */}
           <Image
-            src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1600&auto=format&fit=crop&q=60"
+            src="/lifeladprao.jpeg"
             alt=""       // alt="" เพราะเป็น decorative image (ไม่ใช่เนื้อหาสำคัญ)
             fill         // เต็มพื้นที่ parent
             priority     // โหลดทันที ไม่ lazy load (เพราะอยู่ above the fold)
@@ -173,7 +173,7 @@ export default async function HomePage() {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5">
               Find Your{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-indigo-300">
-                Dream Home
+                Dream Condo
               </span>{' '}
               in Thailand
             </h1>
