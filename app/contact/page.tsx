@@ -144,66 +144,77 @@ export default async function ContactPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-                <div className="flex flex-col sm:flex-row items-center gap-8">
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-100">
+                {/* ─── LINE Official Account Poster ─────────────────────── */}
+                <div className="relative px-8 pt-10 pb-8 text-center" style={{ background: '#06C755' }}>
+                  {/* decorative blurred circles */}
+                  <div className="absolute top-4 right-6 w-24 h-24 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
+                  <div className="absolute bottom-0 left-4 w-32 h-32 rounded-full bg-white/10 blur-3xl" aria-hidden="true" />
 
-                  {/* QR Code */}
-                  <div className="shrink-0 flex flex-col items-center gap-3">
-                    <div className="p-3 bg-white rounded-2xl border-2 border-[#06C755] shadow-md">
+                  {/* Header badge */}
+                  <div className="relative inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-semibold tracking-wider px-3 py-1.5 rounded-full mb-5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                    LINE OFFICIAL ACCOUNT
+                  </div>
+
+                  {/* Main heading */}
+                  <h3 className="relative text-white text-4xl sm:text-5xl font-extrabold leading-tight mb-2 drop-shadow-sm">
+                    เป็นเพื่อน
+                    <br />
+                    กันเถอะ
+                  </h3>
+
+                  {/* LINE ID */}
+                  <p className="relative text-white text-2xl font-bold tracking-wide mt-4">
+                    @521kezzv
+                  </p>
+                  <p className="relative text-white/90 text-sm mt-1">
+                    รับข่าวสาร property ใหม่ๆ บน LINE ของคุณ!
+                  </p>
+
+                  {/* QR Code Card */}
+                  <div className="relative mt-6 inline-block">
+                    <div className="p-4 bg-white rounded-2xl shadow-lg">
                       <Image
                         src="/qr-line.png"
                         alt="LINE QR Code — Home Reality"
-                        width={180}
-                        height={180}
-                        className="rounded-lg"
+                        width={200}
+                        height={200}
+                        className="rounded-lg block"
                       />
                     </div>
-                    <p className="text-xs text-gray-400">สแกนด้วยกล้องมือถือหรือ LINE app</p>
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex flex-col items-center sm:items-start gap-5 text-center sm:text-left">
-                    {/* LINE logo + ID */}
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#06C755' }}>
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="white">
-                          <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400 font-medium">LINE ID</p>
-                        <p className="text-xl font-bold text-gray-900 tracking-wide">@HomeReality</p>
-                      </div>
-                    </div>
-
-                    <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
-                      เพิ่มเพื่อนแล้วส่งข้อความมาได้เลยค่ะ agent ของเราพร้อมตอบทุกวัน
-                      <br />
-                      <span className="font-medium text-gray-700">จันทร์–ศุกร์ 9:00–19:00 · เสาร์–อาทิตย์ 10:00–17:00</span>
-                    </p>
-
-                    {/* ปุ่ม Add Friend */}
-                    <a
-                      href="https://line.me/ti/p/~homereality"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90"
-                      style={{ background: '#06C755' }}
-                    >
-                      <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
-                        <path d="M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
-                      </svg>
-                      เพิ่มเพื่อนใน LINE
-                    </a>
                   </div>
                 </div>
 
-                {/* Divider + note */}
-                <div className="mt-8 pt-6 border-t border-gray-100 flex items-start gap-2">
+                {/* ─── Action area on white ─────────────────────────────── */}
+                <div className="bg-white px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="text-center sm:text-left">
+                    <p className="text-sm font-semibold text-gray-900">สแกน QR หรือกดเพิ่มเพื่อน</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      จันทร์–ศุกร์ 9:00–19:00 · เสาร์–อาทิตย์ 10:00–17:00
+                    </p>
+                  </div>
+
+                  <a
+                    href="https://line.me/R/ti/p/@521kezzv"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90 shrink-0"
+                    style={{ background: '#06C755' }}
+                  >
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
+                      <path d="M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+                    </svg>
+                    เพิ่มเพื่อนใน LINE
+                  </a>
+                </div>
+
+                {/* Note */}
+                <div className="bg-gray-50 px-8 py-4 border-t border-gray-100 flex items-start gap-2">
                   <svg className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-500">
                     กรณีต้องการให้ agent ติดต่อกลับ กรุณาระบุชื่อ เบอร์โทร และ property ที่สนใจในข้อความค่ะ
                   </p>
                 </div>
