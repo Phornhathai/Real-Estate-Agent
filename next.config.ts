@@ -67,6 +67,7 @@ const nextConfig: NextConfig = {
   //   - ถ้าไม่ระบุ → Error: "hostname is not configured under images"
   // ─────────────────────────────────────────────
   images: {
+    unoptimized: true,
     // remotePatterns = รายการโดเมนที่อนุญาตให้ next/image โหลดรูป
     // 🔑 React JS: ไม่ต้องตั้งค่านี้ — <img> โหลดจากไหนก็ได้
     // 🔑 Next.js: ต้องระบุทุกโดเมน เพื่อป้องกัน Server-Side Request Forgery (SSRF)
