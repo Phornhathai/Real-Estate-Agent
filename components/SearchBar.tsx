@@ -19,6 +19,9 @@ export default function SearchBar() {
   // query = ข้อความที่ user พิมพ์ใน search input
   const [query, setQuery] = useState('');
 
+  // type = ประเภท property ที่เลือก ('' = All Types)
+  const [type, setType] = useState('');
+
   // showSuggestions = true เมื่อต้องการแสดง dropdown suggestions
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -31,17 +34,19 @@ export default function SearchBar() {
     s.toLowerCase().includes(query.toLowerCase())
   );
 
+  // สร้าง URL query string รวม location + type
+  const buildHref = (location: string) => {
+    const params = new URLSearchParams();
+    if (location.trim()) params.set('location', location.trim());
+    if (type) params.set('type', type);
+    const qs = params.toString();
+    return qs ? `/listings?${qs}` : '/listings';
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     // e.preventDefault() — ป้องกัน form submit แบบปกติ (ที่จะ reload หน้า)
     e.preventDefault();
-
-    if (query.trim()) {
-      // encodeURIComponent() แปลงอักขระพิเศษ เช่น space → %20, comma → %2C
-      router.push(`/listings?location=${encodeURIComponent(query.trim())}`);
-    } else {
-      // ถ้าไม่ได้พิมพ์อะไร → ไปหน้า listings เฉยๆ (แสดงทั้งหมด)
-      router.push('/listings');
-    }
+    router.push(buildHref(query));
   };
 
   const handleSelect = (suggestion: string) => {
@@ -49,8 +54,8 @@ export default function SearchBar() {
     setQuery(suggestion);
     // 2. ปิด dropdown
     setShowSuggestions(false);
-    // 3. Navigate ไปหน้า listings พร้อม location ที่เลือก
-    router.push(`/listings?location=${encodeURIComponent(suggestion)}`);
+    // 3. Navigate ไปหน้า listings พร้อม location + type ที่เลือก
+    router.push(buildHref(suggestion));
   };
 
   return (
@@ -120,13 +125,15 @@ export default function SearchBar() {
           <div className="px-4 sm:px-4">
             <select
               aria-label="Property type"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
               className="w-full text-sm text-gray-600 outline-none bg-transparent cursor-pointer py-3 sm:py-4"
             >
               <option value="">All Types</option>
-              <option value="house">House</option>
-              <option value="villa">Villa</option>
-              <option value="apartment">Apartment</option>
-              <option value="condo">Condo</option>
+              <option value="House">House</option>
+              <option value="Villa">Villa</option>
+              <option value="Apartment">Apartment</option>
+              <option value="Condo">Condo</option>
             </select>
           </div>
 

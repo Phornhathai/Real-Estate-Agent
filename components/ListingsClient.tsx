@@ -4,10 +4,21 @@ import { useState, useMemo, useEffect } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
-import type { Property } from '@/lib/mock-data';
+import type { Property, PropertyType } from '@/lib/mock-data';
 import PropertyCard from '@/components/PropertyCard';
 
 import FilterSidebar, { FilterValues, DEFAULT_FILTERS } from '@/components/FilterSidebar';
+
+const VALID_TYPES: PropertyType[] = ['House', 'Villa', 'Apartment', 'Condo'];
+
+// Parse ?type=... จาก URL — รองรับทั้ง lowercase/capitalized เผื่อมี legacy link
+function parseTypeParam(raw: string | null): PropertyType[] {
+  if (!raw) return [];
+  const normalized = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+  return VALID_TYPES.includes(normalized as PropertyType)
+    ? [normalized as PropertyType]
+    : [];
+}
 
 interface Props {
   initialProperties: Property[];
@@ -37,6 +48,7 @@ export default function ListingsClient({ initialProperties }: Props) {
     ...DEFAULT_FILTERS,
     location: searchParams.get('location') ?? '',
     // ?? '' = ถ้า searchParams.get() return null → ใช้ '' แทน
+    types: parseTypeParam(searchParams.get('type')),
   });
 
   const [sort, setSort] = useState('featured');
@@ -51,7 +63,13 @@ export default function ListingsClient({ initialProperties }: Props) {
   //   → ถ้าใส่ [] (empty) จะทำแค่ครั้งเดียวตอน mount
   useEffect(() => {
     const loc = searchParams.get('location');
-    if (loc) setFilters((f) => ({ ...f, location: loc }));
+    const typeParam = parseTypeParam(searchParams.get('type'));
+    setFilters((f) => ({
+      ...f,
+      location: loc ?? f.location,
+      // ถ้า URL มี ?type= → override types; ถ้าไม่มี → คงค่าที่ user เลือกใน sidebar
+      types: typeParam.length > 0 ? typeParam : f.types,
+    }));
     // setFilters((f) => ...) ใช้ functional update
     // เพื่อไม่ต้องใส่ filters ใน dependency array (ป้องกัน infinite loop)
   }, [searchParams]);
