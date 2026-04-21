@@ -153,7 +153,7 @@ export default async function HomePage() {
           {/*   fill = เต็ม parent container, sizes = บอก browser ว่าภาพกว้างเท่าไหร่ */}
           {/*   priority = โหลดรูปนี้ก่อน (above the fold) ไม่ lazy load */}
           <Image
-            src="/lifeladprao.jpeg"
+            src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&auto=format&fit=crop&q=80"
             alt=""       // alt="" เพราะเป็น decorative image (ไม่ใช่เนื้อหาสำคัญ)
             fill         // เต็มพื้นที่ parent
             priority     // โหลดทันที ไม่ lazy load (เพราะอยู่ above the fold)
