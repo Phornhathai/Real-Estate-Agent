@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { Agent } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -60,7 +61,7 @@ export default async function AboutPage() {
           <p className="text-center text-gray-400">Coming soon</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {agents.map((agent) => (
+            {agents.map((agent: Agent) => (
               <div
                 key={agent.id}
                 className="bg-white rounded-xl border border-gray-100 p-6 text-center"
