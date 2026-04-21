@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import cloudinary from "@/lib/cloudinary";
+
+function revalidateAgents() {
+  revalidatePath("/admin");
+  revalidatePath("/admin/agents");
+  revalidatePath("/about");
+  revalidatePath("/contact");
+}
 
 export async function PUT(
   request: NextRequest,
@@ -24,6 +32,7 @@ export async function PUT(
       },
     });
 
+    revalidateAgents();
     return NextResponse.json(agent);
   } catch {
     return NextResponse.json({ error: "Failed to update agent" }, { status: 500 });
@@ -45,6 +54,7 @@ export async function DELETE(
     }
 
     await prisma.agent.delete({ where: { id } });
+    revalidateAgents();
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Failed to delete agent" }, { status: 500 });

@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+
+function revalidateAgents() {
+  revalidatePath("/admin");
+  revalidatePath("/admin/agents");
+  revalidatePath("/about");
+  revalidatePath("/contact");
+}
 
 // GET /api/agents
 export async function GET() {
@@ -34,6 +42,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    revalidateAgents();
     return NextResponse.json(agent, { status: 201 });
   } catch {
     return NextResponse.json(
