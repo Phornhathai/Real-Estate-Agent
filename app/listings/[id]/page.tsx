@@ -642,9 +642,6 @@ export default async function PropertyDetailPage({ params }: Props) {
                   </svg>
                   Order Now
                 </a>
-                <button className="w-full py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors">
-                  Schedule Viewing
-                </button>
               </div>
             </div>
 

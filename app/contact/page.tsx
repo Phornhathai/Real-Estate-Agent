@@ -416,7 +416,7 @@ export default async function ContactPage() {
             {[
               {
                 q: 'How do I schedule a property viewing?',
-                a: "Simply contact us via the form above or call our office directly. You can also click 'Schedule Viewing' on any property detail page.",
+                a: 'Simply contact us via the form above or call our office directly, and our agent will arrange a viewing time that works for you.',
               },
               {
                 q: 'Are all listings verified?',
