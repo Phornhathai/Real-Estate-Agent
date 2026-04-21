@@ -6,6 +6,7 @@ import cloudinary from "@/lib/cloudinary";
 function revalidateAll(id?: string) {
   revalidatePath("/");
   revalidatePath("/listings");
+  revalidatePath("/admin");
   revalidatePath("/admin/properties");
   if (id) revalidatePath(`/listings/${id}`);
 }

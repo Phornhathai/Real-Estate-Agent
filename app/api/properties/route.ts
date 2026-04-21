@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 function revalidateAll() {
   revalidatePath("/");
   revalidatePath("/listings");
+  revalidatePath("/admin");
   revalidatePath("/admin/properties");
 }
 
