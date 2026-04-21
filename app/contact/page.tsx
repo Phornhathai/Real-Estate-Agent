@@ -1,11 +1,10 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
-import Image from 'next/image';
+import Image from "next/image";
 
-import Link from 'next/link';
+import Link from "next/link";
 
-
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 // agents = array ข้อมูล agent ทั้ง 3 คน
 //     const [agents, setAgents] = useState([]);
 //     useEffect(() => {
@@ -21,19 +20,19 @@ import { prisma } from '@/lib/prisma';
 //
 //   → render ฝั่ง client → bot อาจอ่านไม่ทัน
 export const metadata: Metadata = {
-  title: 'Contact Us — Meet Our Expert Agents',
+  title: "Contact Us — Meet Our Expert Agents",
   // title กลายเป็น <title> ใน HTML <head>
 
   description:
-    'Get in touch with our team of experienced real estate agents. We are here to help you buy, rent, or sell your property in California.',
+    "Get in touch with our team of experienced real estate agents. We are here to help you buy, rent, or sell your property in California.",
   // description กลายเป็น <meta name="description" content="...">
 
   // openGraph = metadata สำหรับ social media (Facebook, LINE, Twitter)
   openGraph: {
-    title: 'Contact Home Reality',
+    title: "Contact Home Reality",
     description:
-      'Connect with our expert agents. We help you find, buy, rent or sell properties across California.',
-    url: 'https://www.aumestatestudio.com/contact',
+      "Connect with our expert agents. We help you find, buy, rent or sell properties across California.",
+    url: "https://www.aumestatestudio.com/contact",
   },
 };
 
@@ -45,48 +44,97 @@ export const metadata: Metadata = {
 const OFFICE_INFO = [
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+        />
       </svg>
     ),
-    label: 'Office Address',
-    value: '99/1 ถนนสุขุมวิท แขวงคลองเตย\nกรุงเทพมหานคร 10110',
+    label: "Office Address",
+    value: "992 Phahonyothin Rd, Chom Phon, Chatuchak, Bangkok 10900",
     // \n จะถูก render เป็นบรรทัดใหม่ด้วย whitespace-pre-line
   },
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+        />
       </svg>
     ),
-    label: 'Phone',
-    value: '+66 63 939 9665',
+    label: "Phone",
+    value: "+66 63 939 9665",
   },
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+        />
       </svg>
     ),
-    label: 'Email',
-    value: 'hello@realestatethailand.com',
+    label: "Email",
+    value: "hello@realestatethailand.com",
   },
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
     ),
-    label: 'Office Hours',
-    value: 'Mon–Fri: 9am – 7pm\nSat–Sun: 10am – 5pm',
+    label: "Office Hours",
+    value: "Mon–Fri: 9am – 7pm\nSat–Sun: 10am – 5pm",
   },
 ];
 
 //
 //   ใน Next.js มันเป็น Server Component อัตโนมัติ (ไม่ส่ง JS ไป client)
 export default async function ContactPage() {
-  const agents = await prisma.agent.findMany({ orderBy: { name: 'asc' } });
+  const agents = await prisma.agent.findMany({ orderBy: { name: "asc" } });
   return (
     <>
       {/* ================================================================= */}
@@ -104,8 +152,8 @@ export default async function ContactPage() {
           aria-hidden="true"
           style={{
             backgroundImage:
-              'radial-gradient(circle at 25% 25%, white 1px, transparent 1px), radial-gradient(circle at 75% 75%, white 1px, transparent 1px)',
-            backgroundSize: '48px 48px',
+              "radial-gradient(circle at 25% 25%, white 1px, transparent 1px), radial-gradient(circle at 75% 75%, white 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
           }}
         />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -115,10 +163,7 @@ export default async function ContactPage() {
             We typically respond within 2 hours
           </div>
           {/* h1 — heading หลักของหน้า (สำคัญสำหรับ SEO) */}
-          <h1
-            id="contact-hero-heading"
-            className="text-4xl sm:text-5xl font-bold text-white mb-4"
-          >
+          <h1 id="contact-hero-heading" className="text-4xl sm:text-5xl font-bold text-white mb-4">
             Get in Touch
           </h1>
           <p className="text-lg text-blue-100/80">
@@ -146,10 +191,19 @@ export default async function ContactPage() {
 
               <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-100">
                 {/* ─── LINE Official Account Poster ─────────────────────── */}
-                <div className="relative px-8 pt-10 pb-8 text-center" style={{ background: '#06C755' }}>
+                <div
+                  className="relative px-8 pt-10 pb-8 text-center"
+                  style={{ background: "#06C755" }}
+                >
                   {/* decorative blurred circles */}
-                  <div className="absolute top-4 right-6 w-24 h-24 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
-                  <div className="absolute bottom-0 left-4 w-32 h-32 rounded-full bg-white/10 blur-3xl" aria-hidden="true" />
+                  <div
+                    className="absolute top-4 right-6 w-24 h-24 rounded-full bg-white/10 blur-2xl"
+                    aria-hidden="true"
+                  />
+                  <div
+                    className="absolute bottom-0 left-4 w-32 h-32 rounded-full bg-white/10 blur-3xl"
+                    aria-hidden="true"
+                  />
 
                   {/* Header badge */}
                   <div className="relative inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-semibold tracking-wider px-3 py-1.5 rounded-full mb-5">
@@ -200,7 +254,7 @@ export default async function ContactPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90 shrink-0"
-                    style={{ background: '#06C755' }}
+                    style={{ background: "#06C755" }}
                   >
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
                       <path d="M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
@@ -211,11 +265,22 @@ export default async function ContactPage() {
 
                 {/* Note */}
                 <div className="bg-gray-50 px-8 py-4 border-t border-gray-100 flex items-start gap-2">
-                  <svg className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-4 h-4 text-gray-400 mt-0.5 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   <p className="text-xs text-gray-500">
-                    กรณีต้องการให้ agent ติดต่อกลับ กรุณาระบุชื่อ เบอร์โทร และ property ที่สนใจในข้อความค่ะ
+                    กรณีต้องการให้ agent ติดต่อกลับ กรุณาระบุชื่อ เบอร์โทร และ property
+                    ที่สนใจในข้อความค่ะ
                   </p>
                 </div>
               </div>
@@ -257,15 +322,26 @@ export default async function ContactPage() {
                   aria-hidden="true"
                   style={{
                     backgroundImage:
-                      'linear-gradient(#93c5fd 1px, transparent 1px), linear-gradient(90deg, #93c5fd 1px, transparent 1px)',
-                    backgroundSize: '32px 32px',
+                      "linear-gradient(#93c5fd 1px, transparent 1px), linear-gradient(90deg, #93c5fd 1px, transparent 1px)",
+                    backgroundSize: "32px 32px",
                   }}
                 />
                 <div className="relative text-center">
                   {/* Pin icon */}
                   <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-md">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <svg
+                      className="w-5 h-5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
                     </svg>
                   </div>
                   <p className="text-xs font-semibold text-gray-700">Home Reality</p>
@@ -319,7 +395,10 @@ export default async function ContactPage() {
                 className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
               >
                 {/* Header gradient สีน้ำเงิน (decorative) */}
-                <div className="h-28 bg-gradient-to-br from-blue-600 to-indigo-700" aria-hidden="true" />
+                <div
+                  className="h-28 bg-gradient-to-br from-blue-600 to-indigo-700"
+                  aria-hidden="true"
+                />
                 <div className="px-6 pb-6">
                   {/* Avatar — -mt-12 ดึงขึ้นมาทับ gradient ข้างบน */}
                   <div className="relative -mt-12 mb-4">
@@ -347,7 +426,11 @@ export default async function ContactPage() {
                   {/* Stats Row: Rating | Listings | Experience */}
                   <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
                     <span className="flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5 text-amber-400 fill-amber-400" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg
+                        className="w-3.5 h-3.5 text-amber-400 fill-amber-400"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                       </svg>
                       {agent.rating}
@@ -370,8 +453,19 @@ export default async function ContactPage() {
                       href={`tel:${agent.phone}`}
                       className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors"
                     >
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      <svg
+                        className="w-4 h-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                        />
                       </svg>
                       {agent.phone}
                     </a>
@@ -380,8 +474,19 @@ export default async function ContactPage() {
                       href={`mailto:${agent.email}`}
                       className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors"
                     >
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      <svg
+                        className="w-4 h-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        />
                       </svg>
                       {agent.email}
                     </a>
@@ -426,20 +531,20 @@ export default async function ContactPage() {
             {/* วนลูป FAQ items — ใช้ destructuring { q, a } จาก object */}
             {[
               {
-                q: 'How do I schedule a property viewing?',
-                a: 'Simply contact us via the form above or call our office directly, and our agent will arrange a viewing time that works for you.',
+                q: "How do I schedule a property viewing?",
+                a: "Simply contact us via the form above or call our office directly, and our agent will arrange a viewing time that works for you.",
               },
               {
-                q: 'Are all listings verified?',
-                a: 'Yes. Every property listed on Home Reality is manually reviewed by our team to ensure accuracy of information, pricing, and availability.',
+                q: "Are all listings verified?",
+                a: "Yes. Every property listed on Home Reality is manually reviewed by our team to ensure accuracy of information, pricing, and availability.",
               },
               {
-                q: 'Do you charge fees for using the platform?',
+                q: "Do you charge fees for using the platform?",
                 a: "Browsing listings is completely free. Standard real estate agent fees apply when you proceed with a purchase or rental agreement.",
               },
               {
-                q: 'Can I list my own property?',
-                a: 'Absolutely! Contact our team and we will connect you with one of our licensed agents who will guide you through the listing process.',
+                q: "Can I list my own property?",
+                a: "Absolutely! Contact our team and we will connect you with one of our licensed agents who will guide you through the listing process.",
               },
             ].map(({ q, a }) => (
               <details
@@ -459,7 +564,12 @@ export default async function ContactPage() {
                     viewBox="0 0 24 24"
                     aria-hidden="true"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </summary>
                 {/* เนื้อหาคำตอบ — แสดงเมื่อ <details> เปิด */}
