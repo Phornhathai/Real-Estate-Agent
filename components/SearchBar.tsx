@@ -60,7 +60,7 @@ export default function SearchBar() {
       <form onSubmit={handleSubmit} role="search">
         {/* Container ของ input + select + button */}
         {/* rounded-2xl shadow-xl = มุมมน + เงาเพื่อให้ดูลอยขึ้นมา */}
-        <div className="flex items-center bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
 
           {/* ============================================================= */}
           {/* 📍 Location Input — ช่องค้นหาตามตำแหน่ง                        */}
@@ -110,16 +110,17 @@ export default function SearchBar() {
           {/* ============================================================= */}
           {/* ─── Divider — เส้นคั่นแนวตั้ง                                  */}
           {/* ============================================================= */}
-          <div className="w-px h-8 bg-gray-200 shrink-0" aria-hidden="true" />
+          <div className="hidden sm:block w-px h-8 bg-gray-200 shrink-0" aria-hidden="true" />
+          <div className="sm:hidden h-px w-full bg-gray-200 shrink-0" aria-hidden="true" />
 
           {/* ============================================================= */}
           {/* 🏠 Property Type Select — dropdown เลือกประเภทอสังหา            */}
           {/* ============================================================= */}
           {/* ⚠️ ตอนนี้เป็น uncontrolled (ไม่มี state) — ยังไม่ได้ใช้ค่า filter */}
-          <div className="px-4">
+          <div className="px-4 sm:px-4">
             <select
               aria-label="Property type"
-              className="text-sm text-gray-600 outline-none bg-transparent cursor-pointer py-4"
+              className="w-full text-sm text-gray-600 outline-none bg-transparent cursor-pointer py-3 sm:py-4"
             >
               <option value="">All Types</option>
               <option value="house">House</option>
@@ -130,14 +131,15 @@ export default function SearchBar() {
           </div>
 
           {/* Divider */}
-          <div className="w-px h-8 bg-gray-200 shrink-0" aria-hidden="true" />
+          <div className="hidden sm:block w-px h-8 bg-gray-200 shrink-0" aria-hidden="true" />
+          <div className="sm:hidden h-px w-full bg-gray-200 shrink-0" aria-hidden="true" />
 
           {/* ============================================================= */}
           {/* 🔍 Search Button — type="submit" ทำให้กด Enter ได้              */}
           {/* ============================================================= */}
           <button
             type="submit"
-            className="m-2 px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2"
+            className="m-2 px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
           >
             {/* Icon แว่นขยาย */}
             <svg
