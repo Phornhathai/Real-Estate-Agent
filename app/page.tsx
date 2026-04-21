@@ -148,7 +148,7 @@ export default async function HomePage() {
         </div>
 
         {/* Background property image — รูปบ้านเป็นพื้นหลัง */}
-        <div className="absolute inset-0 opacity-20" aria-hidden="true">
+        <div className="absolute inset-0 opacity-60" aria-hidden="true">
           {/* 🔑 next/image: ใช้ fill + sizes แทน width/height สำหรับ background image */}
           {/*   fill = เต็ม parent container, sizes = บอก browser ว่าภาพกว้างเท่าไหร่ */}
           {/*   priority = โหลดรูปนี้ก่อน (above the fold) ไม่ lazy load */}
