@@ -61,7 +61,7 @@ const OFFICE_INFO = [
       </svg>
     ),
     label: 'Phone',
-    value: '+66 2 123 4567',
+    value: '+66 63 939 9665',
   },
   {
     icon: (
