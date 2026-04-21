@@ -623,7 +623,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* CTA Buttons — ปุ่ม Order + Schedule */}
               <div className="space-y-3">
                 <a
-                  href="tel:09XXXXXXXX"
+                  href="tel:0639399665"
                   className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <svg
@@ -670,19 +670,17 @@ export default async function PropertyDetailPage({ params }: Props) {
                   <div className="text-sm text-gray-500">Licensed Home Reality Agent</div>
                   {/* Rating + Listings + Experience */}
                   <div className="flex items-center gap-1 mt-1">
-                    <svg
+                    {/* <svg
                       className="w-3.5 h-3.5 text-amber-400 fill-amber-400"
                       viewBox="0 0 24 24"
                       aria-hidden="true"
                     >
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                    <span className="text-xs font-medium text-gray-700">
+                    </svg> */}
+                    {/* <span className="text-xs font-medium text-gray-700">
                       {property.agent.rating}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      · {property.agent.totalListings} listings · {property.agent.experience}yr exp
-                    </span>
+                    </span> */}
+                    <span className="text-xs text-gray-400">{property.agent.experience}yr exp</span>
                   </div>
                 </div>
               </div>
