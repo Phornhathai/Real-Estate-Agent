@@ -106,8 +106,8 @@ export default function SearchBar() {
               // setTimeout 150ms เพื่อให้ onMouseDown ของ suggestion ทำงานก่อน
               // ถ้าไม่มี delay → dropdown จะปิดก่อนที่ click จะถูก register
               onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-              placeholder="Search by city, neighborhood, or address..."
-              aria-label="Search properties by location"
+              placeholder="Enter city or address (e.g. Bangkok, Sukhumvit)"
+              aria-label="Search properties by city or address"
               className="flex-1 outline-none text-gray-900 placeholder-gray-400 text-sm bg-transparent"
             />
           </div>
