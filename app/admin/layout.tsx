@@ -3,48 +3,83 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   if (pathname === "/admin/login") return <>{children}</>;
 
+  const navLinkClass = (active: boolean) =>
+    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+      active ? "bg-blue-50 text-blue-600 font-medium" : "text-gray-600 hover:bg-gray-50"
+    }`;
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Mobile top bar */}
+      <header className="md:hidden sticky top-0 z-30 flex items-center justify-between bg-white border-b border-gray-100 px-4 h-14">
+        <span className="font-bold text-gray-900">Home Reality Admin</span>
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="เปิดเมนู"
+          className="p-2 -mr-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </header>
+
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <button
+          type="button"
+          aria-label="ปิดเมนู"
+          onClick={() => setSidebarOpen(false)}
+          className="md:hidden fixed inset-0 z-40 bg-black/40"
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 w-56 bg-white border-r border-gray-100 flex flex-col">
-        <div className="p-5 border-b border-gray-100">
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 flex flex-col transform transition-transform duration-200 ease-out md:w-56 md:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
           <span className="font-bold text-gray-900">Home Reality Admin</span>
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="ปิดเมนู"
+            className="md:hidden p-1 -mr-1 text-gray-500 hover:bg-gray-50 rounded"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
-          <Link
-            href="/admin"
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-              pathname === "/admin"
-                ? "bg-blue-50 text-blue-600 font-medium"
-                : "text-gray-600 hover:bg-gray-50"
-            }`}
-          >
+          <Link href="/admin" className={navLinkClass(pathname === "/admin")}>
             Dashboard
           </Link>
           <Link
             href="/admin/properties"
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-              pathname.startsWith("/admin/properties")
-                ? "bg-blue-50 text-blue-600 font-medium"
-                : "text-gray-600 hover:bg-gray-50"
-            }`}
+            className={navLinkClass(pathname.startsWith("/admin/properties"))}
           >
             Properties
           </Link>
           <Link
             href="/admin/agents"
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-              pathname.startsWith("/admin/agents")
-                ? "bg-blue-50 text-blue-600 font-medium"
-                : "text-gray-600 hover:bg-gray-50"
-            }`}
+            className={navLinkClass(pathname.startsWith("/admin/agents"))}
           >
             Agents
           </Link>
@@ -71,7 +106,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main content */}
-      <main className="ml-56 p-8">{children}</main>
+      <main className="md:ml-56 p-4 sm:p-6 md:p-8">{children}</main>
     </div>
   );
 }
