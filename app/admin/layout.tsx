@@ -54,18 +54,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }`}
       >
         <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-          <span className="font-bold text-gray-900">Home Reality Admin</span>
+          <span className="font-bold text-gray-900 hidden md:block">Home Reality Admin</span>
           <button
             type="button"
             onClick={() => setSidebarOpen(false)}
             aria-label="ปิดเมนู"
-            className="md:hidden p-1 -mr-1 text-gray-500 hover:bg-gray-50 rounded"
+            className="md:hidden ml-auto p-1 -mr-1 text-gray-500 hover:bg-gray-50 rounded"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
+
 
         <nav className="flex-1 p-4 space-y-1">
           <Link href="/admin" className={navLinkClass(pathname === "/admin")}>
