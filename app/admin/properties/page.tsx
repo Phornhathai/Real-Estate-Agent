@@ -13,7 +13,7 @@ export default async function AdminPropertiesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Properties</h1>
         <Link
           href="/admin/properties/new"
@@ -34,8 +34,8 @@ export default async function AdminPropertiesPage() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
+          <table className="w-full min-w-[720px] text-sm">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">ชื่อ</th>
@@ -52,7 +52,7 @@ export default async function AdminPropertiesPage() {
                   <td className="px-4 py-3 font-medium text-gray-900">{p.name}</td>
                   <td className="px-4 py-3 text-gray-600">{p.type}</td>
                   <td className="px-4 py-3 text-gray-600">{p.location}</td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                     ฿{p.price.toLocaleString()}/{p.priceType}
                   </td>
                   <td className="px-4 py-3">
