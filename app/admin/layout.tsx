@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { logout } from "./_actions/logout";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -87,12 +87,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className="p-4 border-t border-gray-100">
-          <button
-            onClick={() => signOut({ callbackUrl: "/admin/login" })}
-            className="w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors text-left"
-          >
-            ออกจากระบบ
-          </button>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors text-left"
+            >
+              ออกจากระบบ
+            </button>
+          </form>
           <Link
             href="/"
             target="_blank"
