@@ -36,7 +36,7 @@ export default async function AdminPropertiesPage() {
       ) : (
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[640px]">
+          <table className="w-full text-sm min-w-160">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">ชื่อ</th>
@@ -80,6 +80,7 @@ export default async function AdminPropertiesPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>
