@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import ListingsClient from '@/components/ListingsClient';
 import { prisma } from '@/lib/prisma';
 import { toProperty } from '@/lib/transform';
+import { SITE_URL } from '@/lib/seo';
 
 // Client Component ที่จัดการทุกอย่างของหน้า listings:
 //   - อ่าน URL search params (?location=, ?type=, ?sort=)
@@ -16,14 +17,15 @@ import { toProperty } from '@/lib/transform';
 //   → ผลลัพธ์: "Property Listings — Browse Homes, Villas & Apartments | Home Reality"
 //
 export const metadata: Metadata = {
-  title: 'Property Listings — Browse Homes, Villas & Apartments',
+  title: 'Property Listings — Browse Homes, Villas & Apartments in Thailand',
   description:
-    'Explore our full collection of properties available for rent and sale. Filter by location, price, type, and amenities to find your perfect home.',
+    'Browse all properties on Home Reality — houses, villas, apartments, and condos for rent and sale across Thailand. Filter by location (Bangkok, Chiang Mai, Phuket, Hua Hin), price, type, and amenities.',
+  alternates: { canonical: '/listings' },
   openGraph: {
-    title: 'Property Listings | Home Reality',
+    title: 'Property Listings | Home Reality (homereality.homes)',
     description:
-      'Browse premium properties — houses, villas, apartments, and condos across California.',
-    url: 'https://www.aumestatestudio.com/listings',
+      'Browse premium properties — houses, villas, apartments, and condos across Thailand.',
+    url: `${SITE_URL}/listings`,
   },
 };
 

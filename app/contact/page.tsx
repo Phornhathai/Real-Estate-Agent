@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
+import { SITE_URL } from "@/lib/seo";
 // agents = array ข้อมูล agent ทั้ง 3 คน
 //     const [agents, setAgents] = useState([]);
 //     useEffect(() => {
@@ -20,19 +21,18 @@ import { prisma } from "@/lib/prisma";
 //
 //   → render ฝั่ง client → bot อาจอ่านไม่ทัน
 export const metadata: Metadata = {
-  title: "Contact Us — Meet Our Expert Agents",
-  // title กลายเป็น <title> ใน HTML <head>
+  title: "Contact Us — Meet Our Expert Agents in Thailand",
 
   description:
-    "Get in touch with our team of experienced real estate agents. We are here to help you buy, rent, or sell your property in California.",
-  // description กลายเป็น <meta name="description" content="...">
+    "Get in touch with Home Reality's expert real estate agents in Thailand. We help you buy, rent, or sell properties in Bangkok, Chiang Mai, Phuket, Hua Hin, and across Thailand. LINE @521kezzv · Tel +66 63 939 9665.",
 
-  // openGraph = metadata สำหรับ social media (Facebook, LINE, Twitter)
+  alternates: { canonical: "/contact" },
+
   openGraph: {
-    title: "Contact Home Reality",
+    title: "Contact Home Reality (homereality.homes)",
     description:
-      "Connect with our expert agents. We help you find, buy, rent or sell properties across California.",
-    url: "https://www.aumestatestudio.com/contact",
+      "Connect with our expert agents in Thailand — buy, rent, or sell properties in Bangkok, Phuket, Chiang Mai and more.",
+    url: `${SITE_URL}/contact`,
   },
 };
 

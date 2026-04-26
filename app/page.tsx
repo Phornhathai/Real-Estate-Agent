@@ -12,6 +12,7 @@ import PropertyCard from '@/components/PropertyCard';
 
 import { prisma } from '@/lib/prisma';
 import { toProperty } from '@/lib/transform';
+import { SITE_URL } from '@/lib/seo';
 
 //   เฉพาะ fields ที่กำหนด (title, description, openGraph)
 //   fields ที่ไม่ได้กำหนด (เช่น twitter, robots) จะใช้ค่าจาก layout.tsx
@@ -22,13 +23,17 @@ import { toProperty } from '@/lib/transform';
 //     <meta property="og:title" content="..." />
 //   </Helmet>
 export const metadata: Metadata = {
-  title: 'Home Reality — Find Your Dream Home',  // title ของหน้าแรก
+  // ชื่อโดเมน + คำค้นหายอดนิยม → ตอบสนองทั้ง brand search ("homereality")
+  // และ generic search ("บ้านเช่าไทย", "real estate Thailand")
+  title: 'Home Reality | homereality.homes — บ้าน คอนโด วิลล่า เช่า/ขาย ทั่วไทย',
   description:
-    'Discover premium properties for rent and sale across Thailand. Browse luxury villas, modern apartments, family homes, and condos with Home Reality.',
+    'Home Reality (homereality.homes) — เว็บอสังหาริมทรัพย์ที่คนไทยไว้ใจ ค้นหาบ้าน คอนโด วิลล่า อพาร์ตเมนต์สำหรับเช่าและขายในกรุงเทพ เชียงใหม่ ภูเก็ต หัวหิน ราคาดี ทำเลเด่น พร้อม agent มืออาชีพ.',
+  alternates: { canonical: '/' },
   openGraph: {
-    title: 'Home Reality — Find Your Dream Home',
-    description: 'Discover premium properties for rent and sale across Thailand.',
-    url: 'https://www.aumestatestudio.com',
+    title: 'Home Reality | homereality.homes',
+    description:
+      'Discover premium properties for rent and sale across Thailand — Bangkok, Chiang Mai, Phuket, Hua Hin.',
+    url: SITE_URL,
   },
 };
 

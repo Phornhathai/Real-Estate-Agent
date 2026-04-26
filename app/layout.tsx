@@ -6,6 +6,7 @@ import './globals.css';
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { SITE_URL, SITE_BRAND, SITE_DESCRIPTION } from '@/lib/seo';
 // @/ = alias ชี้ไปที่ root ของโปรเจกต์ (ตั้งค่าใน tsconfig.json)
 //   หรือตั้ง alias เองใน webpack/vite config
 
@@ -33,61 +34,100 @@ const inter = Inter({
 //   - metadata ใน layout.tsx = ค่า default สำหรับทุกหน้า
 //   - แต่ละหน้าสามารถ override ด้วย metadata ของตัวเอง
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.aumestatestudio.com'),
+  metadataBase: new URL(SITE_URL),
 
   // title object — กำหนด title ของหน้าเว็บ
+  // ใส่ชื่อโดเมน + Thailand เพื่อให้ Google จับคู่กับการค้นหา "homereality" ง่ายขึ้น
   title: {
-    default: 'Home Reality — Find Your Dream Home',  // title เมื่อไม่มีหน้าไหน override
-    template: '%s | Home Reality',  // template สำหรับหน้าอื่น: "Listings | Home Reality"
+    default: 'Home Reality | homereality.homes — อสังหาริมทรัพย์ บ้าน คอนโด เช่า/ขาย ในประเทศไทย',
+    template: '%s | Home Reality (homereality.homes)',
   },
 
   // description — แสดงในผลค้นหา Google ใต้ title
-  description:
-    'Discover premium properties for rent and sale. Browse houses, villas, apartments, and condos with Home Reality — your trusted real estate partner in Thailand.',
+  // ใส่ทั้งภาษาไทย/อังกฤษ + ชื่อแบรนด์/โดเมนซ้ำ เพื่อ rank คำว่า "homereality"
+  description: SITE_DESCRIPTION,
 
-  // keywords — คำค้นหาที่เกี่ยวข้อง (Google ไม่ค่อยใช้แล้ว แต่ search engines อื่นยังใช้)
-  keywords: ['real estate', 'homes for rent', 'luxury properties', 'Thailand homes', 'buy house', 'property listings'],
+  // keywords — คำค้นหาที่เกี่ยวข้อง (Google ไม่ค่อยใช้แล้ว แต่ Bing/DuckDuckGo ยังใช้)
+  keywords: [
+    'homereality',
+    'home reality',
+    'homereality.homes',
+    'Home Reality Thailand',
+    'อสังหาริมทรัพย์',
+    'บ้านเช่า',
+    'คอนโดเช่า',
+    'บ้านขาย',
+    'คอนโดขาย',
+    'real estate Thailand',
+    'homes for rent Bangkok',
+    'condos for sale Thailand',
+    'luxury villas Phuket',
+    'property listings Thailand',
+  ],
 
-  authors: [{ name: 'Home Reality' }],
-  creator: 'Home Reality',
+  // alternates.canonical — บอก Google ว่า URL หลักของแต่ละหน้าคืออันไหน
+  // กัน duplicate-content และรวม ranking signals ไว้ที่ canonical
+  alternates: {
+    canonical: '/',
+  },
+
+  authors: [{ name: SITE_BRAND, url: SITE_URL }],
+  creator: SITE_BRAND,
+  publisher: SITE_BRAND,
+
+  // Application name — บางครั้งใช้แสดงในผลค้นหา/share
+  applicationName: SITE_BRAND,
+
+  // 🔐 Search Engine Verification
+  // ใส่ค่าที่ได้จาก Google Search Console / Bing Webmaster Tools
+  // วิธีเอาค่า: GSC → Settings → Ownership verification → HTML tag → copy content="..."
+  // ⚠️ ถ้ายังไม่ได้ verify Google Search Console — เว็บอาจไม่ขึ้นใน Google เลย
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    other: {
+      'msvalidate.01': process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION ?? '',
+    },
+  },
 
   // Open Graph — ข้อมูลที่แสดงเมื่อ share ลิงก์ใน Facebook, LINE, Discord ฯลฯ
   openGraph: {
-    type: 'website',                                    // ประเภทเนื้อหา
-    locale: 'en_US',                                    // ภาษา
-    url: 'https://www.aumestatestudio.com',             // URL ของเว็บ
-    siteName: 'Home Reality',                       // ชื่อเว็บ
-    title: 'Home Reality — Find Your Dream Home',   // title ที่แสดงตอน share
-    description:                                         // description ที่แสดงตอน share
-      'Discover premium properties for rent and sale across Thailand. Luxury villas, modern apartments, family homes, and more.',
+    type: 'website',
+    locale: 'th_TH',
+    alternateLocale: ['en_US'],
+    url: SITE_URL,
+    siteName: SITE_BRAND,
+    title: 'Home Reality | homereality.homes — Find Your Dream Home in Thailand',
+    description:
+      'Discover premium properties for rent and sale across Thailand. Luxury villas, modern apartments, family homes, and condos in Bangkok, Chiang Mai, Phuket and more — only on homereality.homes.',
     images: [
       {
         url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1200&auto=format&fit=crop&q=80',
-        width: 1200,    // ขนาดรูปที่ Facebook แนะนำ = 1200x630
+        width: 1200,
         height: 630,
-        alt: 'Home Reality — Luxury Properties',  // alt text สำหรับ accessibility
+        alt: 'Home Reality — Luxury Properties in Thailand',
       },
     ],
   },
 
   // Twitter Card — ข้อมูลที่แสดงเมื่อ share ลิงก์ใน Twitter/X
   twitter: {
-    card: 'summary_large_image',  // แสดงรูปใหญ่ (แทน summary ที่รูปเล็ก)
-    title: 'Home Reality — Find Your Dream Home',
-    description: 'Discover premium properties for rent and sale across Thailand.',
+    card: 'summary_large_image',
+    title: 'Home Reality | homereality.homes',
+    description:
+      'Premium properties for rent and sale across Thailand — Bangkok, Chiang Mai, Phuket, Hua Hin.',
     images: ['https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1200&auto=format&fit=crop&q=80'],
   },
 
   // Robots — บอก search engine ว่าให้ index หน้านี้ไหม
   robots: {
-    index: true,      // ให้ Google index หน้านี้
-    follow: true,     // ให้ Google ตาม link ในหน้านี้ไปหน้าอื่น
+    index: true,
+    follow: true,
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,      // -1 = ไม่จำกัดขนาด video preview
-      'max-image-preview': 'large',  // ให้ Google แสดงรูป preview ขนาดใหญ่
-      'max-snippet': -1,             // -1 = ไม่จำกัดความยาว text snippet
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
     },
   },
 };
@@ -117,25 +157,75 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;  // children = เนื้อหาของหน้าปัจจุบัน (page.tsx)
+  children: React.ReactNode;
 }) {
+  // 🏢 Organization JSON-LD — สำคัญที่สุดสำหรับการค้นหาด้วยชื่อแบรนด์ "homereality"
+  // Google ใช้ข้อมูลนี้สร้าง Knowledge Panel + จับคู่แบรนด์กับโดเมน
+  // alternateName ช่วยให้ Google รู้ว่า "Home Reality", "homereality", "homereality.homes"
+  // คือสิ่งเดียวกัน → ไม่ว่า user พิมพ์แบบไหนก็ rank โดเมนเรา
+  const orgJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateAgent',
+    '@id': `${SITE_URL}/#organization`,
+    name: SITE_BRAND,
+    alternateName: ['homereality', 'homereality.homes', 'Home Reality Thailand'],
+    url: SITE_URL,
+    logo: `${SITE_URL}/icon`,
+    description: SITE_DESCRIPTION,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '992 Phahonyothin Rd, Chom Phon, Chatuchak',
+      addressLocality: 'Bangkok',
+      postalCode: '10900',
+      addressCountry: 'TH',
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+66-63-939-9665',
+      contactType: 'customer service',
+      areaServed: 'TH',
+      availableLanguage: ['Thai', 'English'],
+    },
+    areaServed: {
+      '@type': 'Country',
+      name: 'Thailand',
+    },
+  };
+
+  // 🌐 WebSite JSON-LD — ทำให้ Google แสดง Sitelinks Searchbox ในผลค้นหา
+  // เมื่อค้นหา "homereality" จะมีช่อง search ของเราแสดงใต้ผลลัพธ์โดยตรง
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
+    url: SITE_URL,
+    name: SITE_BRAND,
+    description: SITE_DESCRIPTION,
+    publisher: { '@id': `${SITE_URL}/#organization` },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${SITE_URL}/listings?location={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+    inLanguage: ['th-TH', 'en-US'],
+  };
+
   return (
-    // className={inter.variable} = ใส่ CSS variable --font-inter ให้ใช้ได้ทั้งเว็บ
-    <html lang="en" className={inter.variable}>
-      {/* 🔑 <body> ต้องอยู่ใน Root Layout เช่นกัน */}
-      {/* min-h-screen = ความสูงขั้นต่ำเต็มจอ */}
-      {/* flex flex-col = จัด layout แนวตั้ง (Navbar → content → Footer) */}
-      {/* font-sans = ใช้ font-family ที่ตั้งไว้ใน Tailwind v4 (globals.css) */}
+    <html lang="th" className={inter.variable}>
       <body className="min-h-screen flex flex-col bg-gray-50 font-sans">
-        {/* Navbar — แสดงทุกหน้า (Client Component เพราะมี hamburger menu + usePathname) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <Navbar />
-
-        {/* main flex-1 = ขยายเต็มพื้นที่ว่าง ดัน Footer ลงล่างสุด */}
-        {/* {children} = หน้าที่ตรงกับ URL ปัจจุบัน */}
-        {/* 🔑 React JS: ตรงนี้จะเป็น <Routes>...</Routes> แทน */}
         <main className="flex-1">{children}</main>
-
-        {/* Footer — แสดงทุกหน้า (Server Component เพราะเป็น static content) */}
         <Footer />
       </body>
     </html>
