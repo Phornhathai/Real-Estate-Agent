@@ -1,46 +1,52 @@
 import type { MetadataRoute } from 'next';
 
-import { properties } from '@/lib/mock-data';
-// import ข้อมูล property ทั้งหมด — ใช้สร้าง URL สำหรับ /listings/[id] ทุกตัว
+import { prisma } from '@/lib/prisma';
+import { SITE_URL } from '@/lib/seo';
 
-const BASE_URL = 'https://www.aumestatestudio.com';
+// ใช้ค่าจริงจาก DB แทน mock-data เพื่อให้ sitemap ตรงกับ /listings/[id] ที่ render จริง
+// (ก่อนหน้านี้ sitemap list URL ที่ไม่มีจริง → Google เจอ 404 → ลด crawl budget)
+const BASE_URL = SITE_URL;
 // URL หลักของเว็บ — ใช้ต่อกับ path ของแต่ละหน้า
 
-// 🗺️ Sitemap Function — สร้าง sitemap.xml
-//     <?xml version="1.0" encoding="UTF-8"?>
-//     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-//       <url><loc>https://example.com/</loc></url>
-//     </urlset>
-export default function sitemap(): MetadataRoute.Sitemap {
-  // 📄 Static Pages — หน้าที่มี URL คงที่
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: BASE_URL,                    // หน้าแรก: https://www.aumestatestudio.com
-      lastModified: new Date(),          // วันที่แก้ไขล่าสุด (ใช้วันปัจจุบัน)
-      changeFrequency: 'weekly',         // บอก Google ว่าเนื้อหาเปลี่ยนบ่อยแค่ไหน
-      priority: 1.0,                     // ความสำคัญ 0.0-1.0 (1.0 = สำคัญที่สุด)
+      url: BASE_URL,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 1.0,
     },
     {
-      url: `${BASE_URL}/listings`,       // หน้า listings: .../listings
+      url: `${BASE_URL}/listings`,
       lastModified: new Date(),
-      changeFrequency: 'daily',          // เปลี่ยนทุกวัน (property ใหม่เข้ามา)
-      priority: 0.9,                     // สำคัญรองจากหน้าแรก
+      changeFrequency: 'daily',
+      priority: 0.9,
     },
     {
-      url: `${BASE_URL}/contact`,        // หน้า contact: .../contact
+      url: `${BASE_URL}/about`,
       lastModified: new Date(),
-      changeFrequency: 'monthly',        // ไม่ค่อยเปลี่ยน
-      priority: 0.6,                     // สำคัญน้อยกว่าหน้าอื่น
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/contact`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
     },
   ];
 
-  const propertyPages: MetadataRoute.Sitemap = properties.map((property) => ({
-    url: `${BASE_URL}/listings/${property.id}`,  // เช่น .../listings/beverly-hills-mansion
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,          // as const เพื่อให้ TypeScript รู้ว่าเป็น literal type
-    priority: 0.8,                               // สำคัญ (หน้า detail ของแต่ละ property)
+  // ดึง id + updatedAt จาก DB จริง (กัน sitemap ชี้ไป URL ที่ไม่มีจริง)
+  const dbProperties = await prisma.property
+    .findMany({ select: { id: true, updatedAt: true } })
+    .catch(() => []);
+
+  const propertyPages: MetadataRoute.Sitemap = dbProperties.map((p) => ({
+    url: `${BASE_URL}/listings/${p.id}`,
+    lastModified: p.updatedAt ?? new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
   }));
 
-  // รวม static + dynamic pages แล้ว return เป็น array เดียว
   return [...staticPages, ...propertyPages];
 }

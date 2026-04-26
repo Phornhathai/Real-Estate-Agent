@@ -3,9 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata = {
-  title: "About Us — Home Reality",
+  title: "About Home Reality — Real Estate in Thailand",
   description:
-    "Meet our team of experienced real estate agents dedicated to helping you find your perfect home.",
+    "Meet the team behind Home Reality (homereality.homes). Our experienced real estate agents in Thailand help you buy, rent, or invest in homes, condos, and villas across Bangkok, Chiang Mai, Phuket, and beyond.",
+  alternates: { canonical: "/about" },
 };
 
 export default async function AboutPage() {

@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
 import { toProperty } from "@/lib/transform";
+import { SITE_URL } from "@/lib/seo";
 import ImageGallery from "@/components/ImageGallery";
 // ImageGallery = Client Component สำหรับ lightbox gallery (มี 'use client')
 
@@ -50,13 +51,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: `${property.bedrooms} bed, ${property.bathrooms} bath ${property.type.toLowerCase()} in ${property.location}. ${property.area.toLocaleString()} ตร.ม. · ฿${property.price.toLocaleString()}/${property.priceType}. ${property.description.slice(0, 100)}...`,
 
     // openGraph = metadata สำหรับ Facebook, LINE, Twitter เวลาแชร์ลิงก์
+    alternates: { canonical: `/listings/${property.id}` },
     openGraph: {
       title: `${property.name} | Home Reality`,
       description: property.description.slice(0, 200),
-      url: `https://www.aumestatestudio.com/listings/${property.id}`,
+      url: `${SITE_URL}/listings/${property.id}`,
       images: [
         {
-          url: property.images[0], // รูปแรกเป็น og:image (preview ตอนแชร์)
+          url: property.images[0],
           width: 1200,
           height: 630,
           alt: property.name,
@@ -145,49 +147,51 @@ export default async function PropertyDetailPage({ params }: Props) {
   //   → แต่ถ้าไม่มี SSR, Google bot อาจอ่านไม่ทัน
   //   → Google bot อ่านได้ทันที
   //
-  // Schema ที่ใช้: https://schema.org/Home RealityListing
+  // Schema ที่ใช้: https://schema.org/RealEstateListing
+  // (เดิม "Home RealityListing" / "Home RealityAgent" → schema.org ไม่รู้จัก
+  //  → Google Rich Results test fail → ไม่ขึ้น rich snippet)
   const jsonLd = {
-    "@context": "https://schema.org", // บอก Google ว่าใช้ schema.org
-    "@type": "Home RealityListing", // ประเภท: ประกาศอสังหาริมทรัพย์
-    name: property.name, // ชื่อ property
-    description: property.description, // คำอธิบาย
-    url: `https://www.aumestatestudio.com/listings/${property.id}`, // URL ของหน้านี้
-    image: property.images, // array รูปภาพทั้งหมด
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    name: property.name,
+    description: property.description,
+    url: `${SITE_URL}/listings/${property.id}`,
+    image: property.images,
     offers: {
       "@type": "Offer",
-      price: property.price, // ราคา
-      priceCurrency: "THB", // สกุลเงิน
+      price: property.price,
+      priceCurrency: "THB",
       priceSpecification: {
         "@type": "UnitPriceSpecification",
         price: property.price,
         priceCurrency: "THB",
-        unitText: property.priceType === "month" ? "MON" : "ANN", // ต่อเดือน/ต่อปี
+        unitText: property.priceType === "month" ? "MON" : "ANN",
       },
-      // availability: InStock = ว่างอยู่, OutOfStock = ไม่ว่าง
       availability: property.available
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
     },
     address: {
       "@type": "PostalAddress",
-      streetAddress: property.address, // ที่อยู่
+      streetAddress: property.address,
       addressLocality: property.city,
       addressCountry: "TH",
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: property.coordinates.lat, // ละติจูด
-      longitude: property.coordinates.lng, // ลองจิจูด
+      latitude: property.coordinates.lat,
+      longitude: property.coordinates.lng,
     },
-    numberOfRooms: property.bedrooms, // จำนวนห้องนอน
+    numberOfRooms: property.bedrooms,
+    // FTK = ตารางฟุต — แต่โค้ดเก็บค่าเป็น ตร.ม. → ใช้ MTK (square metres) ตามจริง
     floorSize: {
       "@type": "QuantitativeValue",
-      value: property.area, // พื้นที่ใช้สอย
-      unitCode: "FTK", // หน่วย: ตารางฟุต
+      value: property.area,
+      unitCode: "MTK",
     },
     agent: {
-      "@type": "Home RealityAgent",
-      name: property.agent.name, // ชื่อ agent
+      "@type": "RealEstateAgent",
+      name: property.agent.name,
       email: property.agent.email,
       telephone: property.agent.phone,
     },
