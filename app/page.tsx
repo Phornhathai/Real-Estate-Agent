@@ -188,76 +188,25 @@ export default async function HomePage() {
       {/* 🦸 Hero Section — ส่วนบนสุดของหน้าแรก                            */}
       {/* ================================================================= */}
       <section
-        className="relative min-h-[580px] flex items-center bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 overflow-hidden"
-        aria-label="Hero section" // Accessibility: บอก screen reader ว่าส่วนนี้คืออะไร
+        className="relative min-h-[580px] flex items-end bg-black overflow-hidden"
+        aria-label="Hero section"
       >
-        {/* Background pattern — ลายจุดเพิ่มความสวยงาม */}
-        <div className="absolute inset-0 opacity-10" aria-hidden="true">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 25% 25%, white 1px, transparent 1px), radial-gradient(circle at 75% 75%, white 1px, transparent 1px)",
-              backgroundSize: "48px 48px",
-            }}
-          />
-        </div>
-
-        {/* Background property image — รูปบ้านเป็นพื้นหลัง */}
-        <div className="absolute inset-0 opacity-60" aria-hidden="true">
-          {/* 🔑 next/image: ใช้ fill + sizes แทน width/height สำหรับ background image */}
-          {/*   fill = เต็ม parent container, sizes = บอก browser ว่าภาพกว้างเท่าไหร่ */}
-          {/*   priority = โหลดรูปนี้ก่อน (above the fold) ไม่ lazy load */}
+        <div className="absolute inset-0" aria-hidden="true">
           <Image
             src="/banner-life-ladprao.webp"
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover"
+            className="object-cover opacity-90"
           />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 w-full">
-          <div className="max-w-3xl mx-auto text-center">
-            {/* Eyebrow — badge เล็กๆ เหนือ heading */}
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400" aria-hidden="true" />
-              {totalCount} {totalCount === 1 ? "property" : "properties"} available now
-            </div>
+        {/* bottom gradient to blend into the page */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black/60 to-transparent" aria-hidden="true" />
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5">
-              Find Your{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-indigo-300">
-                Dream Condo
-              </span>{" "}
-              in Thailand
-            </h1>
-            <p className="text-lg text-blue-100/80 mb-10 max-w-xl mx-auto">
-              Discover premium properties across Thailand&apos;s most sought-after neighborhoods.
-              Your perfect home is just a search away.
-            </p>
-
-            {/* SearchBar — Client Component (มี useState + useRouter) */}
-            {/* 🔑 Server Component สามารถ render Client Component เป็น children ได้ */}
-            {/*   Next.js จะ hydrate เฉพาะ Client Components บน client */}
-            <SearchBar />
-
-            {/* Popular Searches — ลิงก์ไปหน้า listings พร้อม filter */}
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-              <span className="text-sm text-white/50">Popular:</span>
-              {["Bangkok", "Chiang Mai", "Phuket", "Hua Hin"].map((loc) => (
-                <Link
-                  key={loc}
-                  // encodeURIComponent แปลงช่องว่างเป็น %20 สำหรับ URL
-                  href={`/listings?location=${encodeURIComponent(loc)}`}
-                  className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs rounded-full border border-white/10 transition-colors"
-                >
-                  {loc}
-                </Link>
-              ))}
-            </div>
-          </div>
+        <div className="relative w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          <SearchBar />
         </div>
       </section>
 
@@ -388,7 +337,7 @@ export default async function HomePage() {
                     className="object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   {/* Gradient overlay — ให้ text อ่านง่ายบนรูป */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-3">
                     <p className="text-white font-semibold text-sm leading-tight">
                       {location.name}
