@@ -188,25 +188,67 @@ export default async function HomePage() {
       {/* 🦸 Hero Section — ส่วนบนสุดของหน้าแรก                            */}
       {/* ================================================================= */}
       <section
-        className="relative min-h-[580px] flex items-end bg-black overflow-hidden"
+        className="relative min-h-[580px] flex items-center bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 overflow-hidden"
         aria-label="Hero section"
       >
-        <div className="absolute inset-0" aria-hidden="true">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-10" aria-hidden="true">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle at 25% 25%, white 1px, transparent 1px), radial-gradient(circle at 75% 75%, white 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
+            }}
+          />
+        </div>
+
+        {/* Background property image */}
+        <div className="absolute inset-0 opacity-60" aria-hidden="true">
           <Image
-            src="/banner-life-ladprao.webp"
+            src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&auto=format&fit=crop&q=80"
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover opacity-90"
+            className="object-cover"
           />
         </div>
 
-        {/* bottom gradient to blend into the page */}
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black/60 to-transparent" aria-hidden="true" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 w-full">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400" aria-hidden="true" />
+              {totalCount} {totalCount === 1 ? "property" : "properties"} available now
+            </div>
 
-        <div className="relative w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          <SearchBar />
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5">
+              Find Your{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-indigo-300">
+                Dream Condo
+              </span>{" "}
+              in Thailand
+            </h1>
+            <p className="text-lg text-blue-100/80 mb-10 max-w-xl mx-auto">
+              Discover premium properties across Thailand&apos;s most sought-after neighborhoods.
+              Your perfect home is just a search away.
+            </p>
+
+            <SearchBar />
+
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+              <span className="text-sm text-white/50">Popular:</span>
+              {["Bangkok", "Chiang Mai", "Phuket", "Hua Hin"].map((loc) => (
+                <Link
+                  key={loc}
+                  href={`/listings?location=${encodeURIComponent(loc)}`}
+                  className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs rounded-full border border-white/10 transition-colors"
+                >
+                  {loc}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
