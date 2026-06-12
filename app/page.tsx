@@ -209,12 +209,12 @@ export default async function HomePage() {
           {/*   fill = เต็ม parent container, sizes = บอก browser ว่าภาพกว้างเท่าไหร่ */}
           {/*   priority = โหลดรูปนี้ก่อน (above the fold) ไม่ lazy load */}
           <Image
-            src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&auto=format&fit=crop&q=80"
-            alt="" // alt="" เพราะเป็น decorative image (ไม่ใช่เนื้อหาสำคัญ)
-            fill // เต็มพื้นที่ parent
-            priority // โหลดทันที ไม่ lazy load (เพราะอยู่ above the fold)
-            sizes="100vw" // รูปกว้างเต็มจอ
-            className="object-cover" // crop ให้เต็มกรอบ
+            src="/banner-life-ladprao.webp"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
         </div>
 
@@ -350,23 +350,6 @@ export default async function HomePage() {
                 />
               </svg>
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================================= */}
-      {/* 🏙 Promotion Banner — Life Ladprao Valley                        */}
-      {/* ================================================================= */}
-      <section className="py-10 bg-white" aria-label="Featured project promotion">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-2xl overflow-hidden shadow-lg">
-            <Image
-              src="/banner-life-ladprao.webp"
-              alt="Life Ladprao Valley — โครงการคอนโดใหม่ใจกลางลาดพร้าว"
-              width={1920}
-              height={540}
-              className="w-full object-cover"
-            />
           </div>
         </div>
       </section>
