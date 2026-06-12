@@ -66,7 +66,7 @@ const OFFICE_INFO = [
       </svg>
     ),
     label: "Office Address",
-    value: "992 Phahonyothin Rd, Chom Phon, Chatuchak, Bangkok 10900",
+    value: "13/74 ซอย งามวงศ์วาน 43 แยก 2-13 (ชินเขต 1/33)\nแขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพมหานคร",
     // \n จะถูก render เป็นบรรทัดใหม่ด้วย whitespace-pre-line
   },
   {
@@ -107,7 +107,7 @@ const OFFICE_INFO = [
       </svg>
     ),
     label: "Email",
-    value: "hello@realestatethailand.com",
+    value: "homereality.8@gmail.com",
   },
   {
     icon: (
