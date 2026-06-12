@@ -88,6 +88,7 @@ const OFFICE_INFO = [
       </svg>
     ),
     label: "Phone",
+    value: "065-616-2879",
   },
   {
     icon: (
