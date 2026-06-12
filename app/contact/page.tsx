@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   title: "Contact Us — Meet Our Expert Agents in Thailand",
 
   description:
-    "Get in touch with Home Reality's expert real estate agents in Thailand. We help you buy, rent, or sell properties in Bangkok, Chiang Mai, Phuket, Hua Hin, and across Thailand. LINE @521kezzv · Tel +66 63 939 9665.",
+    "Get in touch with Home Reality's expert real estate agents in Thailand. We help you buy, rent, or sell properties in Bangkok, Chiang Mai, Phuket, Hua Hin, and across Thailand. LINE @homereality · Tel 065-616-2879.",
 
   alternates: { canonical: "/contact" },
 
@@ -66,7 +66,8 @@ const OFFICE_INFO = [
       </svg>
     ),
     label: "Office Address",
-    value: "13/74 ซอย งามวงศ์วาน 43 แยก 2-13 (ชินเขต 1/33)\nแขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพมหานคร",
+    value:
+      "13/74 ซอย งามวงศ์วาน 43 แยก 2-13 (ชินเขต 1/33)\nแขวงทุ่งสองห้อง เขตหลักสี่ กรุงเทพมหานคร",
     // \n จะถูก render เป็นบรรทัดใหม่ด้วย whitespace-pre-line
   },
   {
@@ -87,7 +88,6 @@ const OFFICE_INFO = [
       </svg>
     ),
     label: "Phone",
-    value: "+66 63 939 9665",
   },
   {
     icon: (
@@ -220,7 +220,7 @@ export default async function ContactPage() {
 
                   {/* LINE ID */}
                   <p className="relative text-white text-2xl font-bold tracking-wide mt-4">
-                    @521kezzv
+                    @homereality
                   </p>
                   <p className="relative text-white/90 text-sm mt-1">
                     รับข่าวสาร property ใหม่ๆ บน LINE ของคุณ!
@@ -250,7 +250,7 @@ export default async function ContactPage() {
                   </div>
 
                   <a
-                    href="https://line.me/R/ti/p/@521kezzv"
+                    href="https://line.me/R/ti/p/@homereality"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90 shrink-0"
